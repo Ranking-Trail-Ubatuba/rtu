@@ -1,0 +1,1618 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Ranking Trail Ubatuba</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        :root {
+            --primary-color: #1e7e34;
+            --secondary-color: #0d6efd;
+            --accent-color: #fd7e14;
+        }
+        
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #f8f9fa;
+            padding-top: 56px;
+        }
+        
+        .navbar-brand img {
+            height: 40px;
+        }
+        
+        .section {
+            display: none;
+            padding: 20px;
+        }
+        
+        .active-section {
+            display: block;
+        }
+        
+        .card {
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            margin-bottom: 20px;
+            border: none;
+        }
+        
+        .card-header {
+            background-color: var(--primary-color);
+            color: white;
+            font-weight: bold;
+        }
+        
+        .athlete-grid {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+            margin-top: 20px;
+        }
+
+        .athlete-ranking-card {
+            display: flex;
+            align-items: center;
+            padding: 15px;
+            background-color: white;
+            border-radius: 12px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+            transition: transform 0.2s;
+        }
+
+        .athlete-ranking-card:hover {
+            transform: translateY(-2px);
+        }
+
+        .athlete-avatar {
+            width: 70px;
+            height: 70px;
+            border-radius: 50%;
+            object-fit: cover;
+            border: 3px solid var(--primary-color);
+            margin-right: 15px;
+        }
+
+        .athlete-info {
+            flex: 1;
+        }
+
+        .athlete-position {
+            font-size: 1.5rem;
+            font-weight: bold;
+            color: var(--primary-color);
+            margin-right: 10px;
+            min-width: 40px;
+        }
+
+        .athlete-name {
+            font-size: 1.2rem;
+            font-weight: bold;
+            margin-bottom: 5px;
+        }
+
+        .athlete-stats {
+            display: flex;
+            gap: 15px;
+            flex-wrap: wrap;
+        }
+
+        .stat-item {
+            display: flex;
+            align-items: center;
+            gap: 5px;
+            font-size: 0.9rem;
+            color: #666;
+        }
+
+        .stat-item i {
+            color: var(--primary-color);
+        }
+
+        .athlete-points {
+            font-size: 1.3rem;
+            font-weight: bold;
+            color: var(--primary-color);
+            min-width: 100px;
+            text-align: right;
+        }
+        
+        .athlete-card {
+            cursor: pointer;
+            transition: transform 0.3s;
+        }
+        
+        .athlete-card:hover {
+            transform: translateY(-5px);
+        }
+        
+        .athlete-img {
+            width: 100%;
+            height: 200px;
+            object-fit: cover;
+            border-radius: 8px 8px 0 0;
+        }
+        
+        .ranking-table th {
+            background-color: var(--primary-color);
+            color: white;
+        }
+        
+        .filter-section {
+            background-color: white;
+            padding: 15px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        }
+        
+        .btn-primary {
+            background-color: var(--primary-color);
+            border-color: var(--primary-color);
+        }
+        
+        .btn-primary:hover {
+            background-color: #1a6c2d;
+            border-color: #1a6c2d;
+        }
+        
+        .admin-only {
+            display: none;
+        }
+        
+        .user-logged-in .admin-only {
+            display: block;
+        }
+        
+        .user-logged-in .user-only {
+            display: none;
+        }
+        
+        .athlete-modal-img {
+            width: 100%;
+            max-height: 300px;
+            object-fit: cover;
+            border-radius: 8px;
+        }
+        
+        .table-actions {
+            white-space: nowrap;
+        }
+        
+        .login-container {
+            max-width: 400px;
+            margin: 50px auto;
+            padding: 20px;
+            background-color: white;
+            border-radius: 8px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        }
+        
+        /* Responsividade */
+        @media (max-width: 768px) {
+            .athlete-ranking-card {
+                flex-direction: column;
+                text-align: center;
+                padding: 20px;
+            }
+            
+            .athlete-avatar {
+                margin-right: 0;
+                margin-bottom: 15px;
+            }
+            
+            .athlete-position {
+                margin-right: 0;
+                margin-bottom: 10px;
+            }
+            
+            .athlete-stats {
+                justify-content: center;
+            }
+            
+            .athlete-points {
+                text-align: center;
+                margin-top: 10px;
+            }
+            
+            .stat-item {
+                margin-bottom: 5px;
+            }
+        }
+        
+        .corrida-details {
+            background-color: #f8f9fa;
+            border-radius: 8px;
+            padding: 15px;
+            margin-top: 15px;
+        }
+        
+        .corrida-detail-item {
+            margin-bottom: 10px;
+        }
+        
+        .gender-badge {
+            font-size: 0.8rem;
+            padding: 3px 8px;
+            border-radius: 12px;
+        }
+        
+        .badge-feminino {
+            background-color: #e83e8c;
+            color: white;
+        }
+        
+        .badge-masculino {
+            background-color: #007bff;
+            color: white;
+        }
+    </style>
+</head>
+<body>
+    <!-- Navbar -->
+    <nav class="navbar navbar-expand-lg navbar-dark bg-dark fixed-top">
+        <div class="container">
+            <a class="navbar-brand" href="#">
+                <img src="Logo_RTU.png" alt="Ranking Trail Ubatuba">
+            </a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav me-auto">
+                    <li class="nav-item user-only">
+                        <a class="nav-link" href="#" onclick="showSection('ranking')">Ranking</a>
+                    </li>
+                    <li class="nav-item admin-only">
+                        <a class="nav-link" href="#" onclick="showSection('corridas')">Corridas</a>
+                    </li>
+                    <li class="nav-item admin-only">
+                        <a class="nav-link" href="#" onclick="showSection('atletas')">Atletas</a>
+                    </li>
+                    <li class="nav-item admin-only">
+                        <a class="nav-link" href="#" onclick="showSection('registro')">Registro</a>
+                    </li>
+                    <li class="nav-item admin-only">
+                        <a class="nav-link" href="#" onclick="showSection('ranking')">Ranking</a>
+                    </li>
+                </ul>
+                <ul class="navbar-nav">
+                    <li class="nav-item user-only">
+                        <a class="nav-link" href="#" onclick="showSection('login')">Login</a>
+                    </li>
+                    <li class="nav-item admin-only">
+                        <a class="nav-link" href="#" onclick="logout()">Logout</a>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Seções do site -->
+    <div class="container mt-4">
+        <!-- Seção de Login -->
+        <div id="login" class="section">
+            <div class="login-container">
+                <h2 class="text-center mb-4">Login Administrativo</h2>
+                <form id="loginForm">
+                    <div class="mb-3">
+                        <label for="email" class="form-label">Email</label>
+                        <input type="email" class="form-control" id="email" required>
+                    </div>
+                    <div class="mb-3">
+                        <label for="password" class="form-label">Senha</label>
+                        <input type="password" class="form-control" id="password" required>
+                    </div>
+                    <button type="submit" class="btn btn-primary w-100">Entrar</button>
+                </form>
+                <div id="loginError" class="alert alert-danger mt-3" style="display: none;"></div>
+            </div>
+        </div>
+
+        <!-- Seção de Corridas (Admin) -->
+        <div id="corridas" class="section">
+            <div class="d-flex justify-content-between align-items-center mb-4">
+                <h2>Gerenciar Corridas</h2>
+                <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#corridaModal" onclick="openCorridaModal()">
+                    <i class="fas fa-plus"></i> Nova Corrida
+                </button>
+            </div>
+            
+            <div class="card">
+                <div class="card-header">Lista de Corridas</div>
+                <div class="card-body">
+                    <div class="table-responsive">
+                        <table class="table table-striped">
+                            <thead>
+                                <tr>
+                                    <th>Nome</th>
+                                    <th>Data</th>
+                                    <th>Distâncias</th>
+                                    <th>Altimetrias</th>
+                                    <th>Qtd. Atletas (F/M)</th>
+                                    <th>Ações</th>
+                                </tr>
+                            </thead>
+                            <tbody id="corridasTable">
+                                <!-- Dados carregados via JavaScript -->
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Seção de Atletas (Admin) -->
+        <div id="atletas" class="section">
+            <div class="d-flex justify-content-between align-items-center mb-4">
+                <h2>Gerenciar Atletas</h2>
+                <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#atletaModal" onclick="openAtletaModal()">
+                    <i class="fas fa-plus"></i> Novo Atleta
+                </button>
+            </div>
+            
+            <div class="card">
+                <div class="card-header">Lista de Atletas</div>
+                <div class="card-body">
+                    <div class="table-responsive">
+                        <table class="table table-striped">
+                            <thead>
+                                <tr>
+                                    <th>Foto</th>
+                                    <th>Nome</th>
+                                    <th>Data Nasc.</th>
+                                    <th>Gênero</th>
+                                    <th>Equipe</th>
+                                    <th>Ações</th>
+                                </tr>
+                            </thead>
+                            <tbody id="atletasTable">
+                                <!-- Dados carregados via JavaScript -->
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Seção de Registro (Admin) -->
+        <div id="registro" class="section">
+            <div class="d-flex justify-content-between align-items-center mb-4">
+                <h2>Registro de Resultados</h2>
+                <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#registroModal" onclick="openRegistroModal()">
+                    <i class="fas fa-plus"></i> Novo Registro
+                </button>
+            </div>
+            
+            <div class="card">
+                <div class="card-header">Lista de Registros</div>
+                <div class="card-body">
+                    <div class="table-responsive">
+                        <table class="table table-striped">
+                            <thead>
+                                <tr>
+                                    <th>Atleta</th>
+                                    <th>Corrida</th>
+                                    <th>Distância</th>
+                                    <th>Altimetria</th>
+                                    <th>Posição</th>
+                                    <th>Qtd. Atletas</th>
+                                    <th>Data</th>
+                                    <th>Pontos</th>
+                                    <th>Ações</th>
+                                </tr>
+                            </thead>
+                            <tbody id="registrosTable">
+                                <!-- Dados carregados via JavaScript -->
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Seção de Ranking (Público e Admin) -->
+        <div id="ranking" class="section active-section">
+            <h2 class="mb-4">Ranking de Atletas</h2>
+            
+            <div class="filter-section">
+                <div class="row">
+                    <div class="col-md-3">
+                        <label for="generoFilter" class="form-label">Gênero</label>
+                        <select class="form-select" id="generoFilter">
+                            <option value="todos">Todos</option>
+                            <option value="masculino">Masculino</option>
+                            <option value="feminino">Feminino</option>
+                        </select>
+                    </div>
+                    <div class="col-md-3">
+                        <label for="faixaEtariaFilter" class="form-label">Faixa Etária</label>
+                        <select class="form-select" id="faixaEtariaFilter">
+                            <option value="todas">Todas</option>
+                            <option value="18-24">18-24</option>
+                            <option value="25-34">25-34</option>
+                            <option value="35-44">35-44</option>
+                            <option value="45-54">45-54</option>
+                            <option value="55+">55+</option>
+                        </select>
+                    </div>
+                    <div class="col-md-3">
+                        <label for="anoFilter" class="form-label">Ano</label>
+                        <select class="form-select" id="anoFilter">
+                            <!-- Anos serão carregados via JavaScript -->
+                        </select>
+                    </div>
+                    <div class="col-md-3 d-flex align-items-end">
+                        <button class="btn btn-primary w-100" onclick="filtrarRanking()">
+                            <i class="fas fa-filter"></i> Filtrar
+                        </button>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="athlete-grid" id="rankingGrid">
+                <!-- Atletas carregados via JavaScript -->
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal para Corridas -->
+    <div class="modal fade" id="corridaModal" tabindex="-1">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="corridaModalTitle">Nova Corrida</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <form id="corridaForm">
+                        <input type="hidden" id="corridaId">
+                        <div class="mb-3">
+                            <label for="corridaNome" class="form-label">Nome da Corrida</label>
+                            <input type="text" class="form-control" id="corridaNome" required>
+                        </div>
+                        <div class="mb-3">
+                            <label for="corridaData" class="form-label">Data da Corrida</label>
+                            <input type="date" class="form-control" id="corridaData" required>
+                        </div>
+                        <div class="mb-3">
+                            <label for="corridaDistancias" class="form-label">Distâncias (KM)</label>
+                            <textarea class="form-control" id="corridaDistancias" rows="3" placeholder="Digite as distâncias separadas por vírgula. Ex: 7, 12, 21, 42" required></textarea>
+                            <div class="form-text">Separe as distâncias por vírgula. Ex: 7, 12, 21, 42</div>
+                        </div>
+                        <div class="mb-3">
+                            <label for="corridaAltimetrias" class="form-label">Altimetrias (D+)</label>
+                            <textarea class="form-control" id="corridaAltimetrias" rows="3" placeholder="Digite as altimetrias separadas por vírgula. Ex: 300, 800, 1200, 3000" required></textarea>
+                            <div class="form-text">Separe as altimetrias por vírgula. Ex: 300, 800, 1200, 3000</div>
+                        </div>
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                    <label for="corridaQtdAtletasFeminino" class="form-label">Quantidade de Atletas Feminino</label>
+                                    <textarea class="form-control" id="corridaQtdAtletasFeminino" rows="3" placeholder="Digite as quantidades separadas por vírgula. Ex: 35, 208, 333, 620" required></textarea>
+                                    <div class="form-text">Quantidade por distância (feminino)</div>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                    <label for="corridaQtdAtletasMasculino" class="form-label">Quantidade de Atletas Masculino</label>
+                                    <textarea class="form-control" id="corridaQtdAtletasMasculino" rows="3" placeholder="Digite as quantidades separadas por vírgula. Ex: 35, 208, 333, 620" required></textarea>
+                                    <div class="form-text">Quantidade por distância (masculino)</div>
+                                </div>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                    <button type="button" class="btn btn-primary" onclick="saveCorrida()">Salvar</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal para Atletas -->
+    <div class="modal fade" id="atletaModal" tabindex="-1">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="atletaModalTitle">Novo Atleta</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <form id="atletaForm">
+                        <input type="hidden" id="atletaId">
+                        <div class="mb-3">
+                            <label for="atletaFoto" class="form-label">Foto (Link Google Drive)</label>
+                            <input type="text" class="form-control" id="atletaFoto" onchange="updateImagePreview(this.value)">
+                            <div class="form-text">Cole o link do Google Drive. A imagem será normalizada automaticamente.</div>
+                            <div id="image-preview-container" class="mt-2 text-center">
+                                <img id="image-preview" class="img-thumbnail" style="max-height: 200px; display: none;">
+                                <div id="image-error" class="alert alert-warning mt-2" style="display: none;"></div>
+                            </div>
+                        </div>
+                        <div class="mb-3">
+                            <label for="atletaNome" class="form-label">Nome Completo</label>
+                            <input type="text" class="form-control" id="atletaNome" required>
+                        </div>
+                        <div class="mb-3">
+                            <label for="atletaNascimento" class="form-label">Data de Nascimento</label>
+                            <input type="date" class="form-control" id="atletaNascimento" required>
+                        </div>
+                        <div class="mb-3">
+                            <label for="atletaGenero" class="form-label">Gênero</label>
+                            <select class="form-select" id="atletaGenero" required>
+                                <option value="">Selecione</option>
+                                <option value="masculino">Masculino</option>
+                                <option value="feminino">Feminino</option>
+                            </select>
+                        </div>
+                        <div class="mb-3">
+                            <label for="atletaEquipe" class="form-label">Equipe</label>
+                            <input type="text" class="form-control" id="atletaEquipe">
+                        </div>
+                        <div class="mb-3">
+                            <label for="atletaSobre" class="form-label">Sobre</label>
+                            <textarea class="form-control" id="atletaSobre" rows="3"></textarea>
+                        </div>
+                    </form>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                    <button type="button" class="btn btn-primary" onclick="saveAtleta()">Salvar</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal para Registros -->
+    <div class="modal fade" id="registroModal" tabindex="-1">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="registroModalTitle">Novo Registro</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <form id="registroForm">
+                        <input type="hidden" id="registroId">
+                        <div class="mb-3">
+                            <label for="registroAtleta" class="form-label">Atleta</label>
+                            <select class="form-select" id="registroAtleta" required onchange="updateAtletaGenero()">
+                                <option value="">Selecione um atleta</option>
+                            </select>
+                        </div>
+                        <div class="mb-3">
+                            <label for="registroCorrida" class="form-label">Corrida</label>
+                            <select class="form-select" id="registroCorrida" required onchange="updateCorridaDetails()">
+                                <option value="">Selecione uma corrida</option>
+                            </select>
+                        </div>
+                        <div id="corridaDetails" class="corrida-details" style="display: none;">
+                            <h6>Detalhes da Corrida Selecionada:</h6>
+                            <div id="corridaInfo"></div>
+                        </div>
+                        <div class="mb-3">
+                            <label for="registroDistancia" class="form-label">Distância (KM)</label>
+                            <select class="form-select" id="registroDistancia" required onchange="updateQtdAtletasByGenero()">
+                                <option value="">Selecione uma distância</option>
+                            </select>
+                        </div>
+                        <div class="mb-3">
+                            <label for="registroAltimetria" class="form-label">Altimetria (D+)</label>
+                            <select class="form-select" id="registroAltimetria" required>
+                                <option value="">Selecione uma altimetria</option>
+                            </select>
+                        </div>
+                        <div class="mb-3">
+                            <label for="registroQtdAtletas" class="form-label">Quantidade de Atletas</label>
+                            <select class="form-select" id="registroQtdAtletas" required>
+                                <option value="">Selecione quantidade de atletas</option>
+                            </select>
+                            <div class="form-text" id="qtdAtletasInfo"></div>
+                        </div>
+                        <div class="mb-3">
+                            <label for="registroPosicao" class="form-label">Posição de Chegada</label>
+                            <input type="number" class="form-control" id="registroPosicao" required>
+                        </div>
+                    </form>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                    <button type="button" class="btn btn-primary" onclick="saveRegistro()">Salvar</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal para Detalhes do Atleta -->
+    <div class="modal fade" id="atletaDetailModal" tabindex="-1">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="atletaDetailModalTitle">Detalhes do Atleta</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <div class="row">
+                        <div class="col-md-4">
+                            <img id="detailAtletaFoto" class="athlete-modal-img" src="" alt="Foto do atleta">
+                        </div>
+                        <div class="col-md-8">
+                            <h4 id="detailAtletaNome"></h4>
+                            <p><strong>Data de Nascimento:</strong> <span id="detailAtletaNascimento"></span></p>
+                            <p><strong>Gênero:</strong> <span id="detailAtletaGenero"></span></p>
+                            <p><strong>Equipe:</strong> <span id="detailAtletaEquipe"></span></p>
+                            <p><strong>Sobre:</strong> <span id="detailAtletaSobre"></span></p>
+                            <hr>
+                            <h5>Estatísticas</h5>
+                            <p><strong>Total de Pontos:</strong> <span id="detailAtletaPontos"></span></p>
+                            <p><strong>Corridas Participadas:</strong> <span id="detailAtletaCorridas"></span></p>
+                            <p><strong>Melhor Posição:</strong> <span id="detailAtletaMelhorPosicao"></span></p>
+                        </div>
+                    </div>
+                    <div class="mt-4">
+                        <h5>Histórico de Corridas</h5>
+                        <div class="table-responsive">
+                            <table class="table table-striped">
+                                <thead>
+                                    <tr>
+                                        <th>Corrida</th>
+                                        <th>Data</th>
+                                        <th>Distância</th>
+                                        <th>Posição</th>
+                                        <th>Pontos</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="detailAtletaHistorico">
+                                    <!-- Histórico carregado via JavaScript -->
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Fechar</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Scripts -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-auth-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-database-compat.js"></script>
+    
+    <script>
+        // Configuração do Firebase
+        const firebaseConfig = {
+            apiKey: "AIzaSyDi5wK70cNr7tJJ55hFsw3vjrMbFtWdc24",
+            authDomain: "ctos-efd7c.firebaseapp.com",
+            databaseURL: "https://ctos-efd7c-default-rtdb.firebaseio.com",
+            projectId: "ctos-efd7c",
+            storageBucket: "ctos-efd7c.firebasestorage.app",
+            messagingSenderId: "1061563628444",
+            appId: "1:1061563628444:web:834a4c9804f3391fa82659"
+        };
+
+        // Inicializar Firebase
+        firebase.initializeApp(firebaseConfig);
+        const auth = firebase.auth();
+        const database = firebase.database();
+
+        // Variáveis globais
+        let currentUser = null;
+        let corridas = [];
+        let atletas = [];
+        let registros = [];
+        let selectedAtletaGenero = '';
+
+        // ---------- Normalizador Google Drive ----------
+        function normalizeGoogleDriveImage(url) {
+            if (!url) return "";
+            try {
+                url = url.trim();
+                if (url.includes("/file/d/")) {
+                    const id = url.split("/file/d/")[1].split("/")[0];
+                    return `https://lh3.googleusercontent.com/d/${id}`;
+                }
+                if (url.includes("drive.google.com/open?id=")) {
+                    const id = url.split('id=')[1].split('&')[0];
+                    return `https://lh3.googleusercontent.com/d/${id}`;
+                }
+                if (url.includes("lh3.googleusercontent.com/d/")) return url;
+                return url; // accept other public URLs
+            } catch (e) {
+                return '';
+            }
+        }
+
+        // ---------- Preview e validação 640x480 ----------
+        function updateImagePreview(rawUrl) {
+            const preview = document.getElementById('image-preview');
+            const errorEl = document.getElementById('image-error');
+
+            if (!preview) return;
+
+            if (!rawUrl) {
+                preview.style.display = 'none';
+                if (errorEl) errorEl.style.display = 'none';
+                return;
+            }
+
+            const url = normalizeGoogleDriveImage(rawUrl);
+            preview.src = url;
+
+            if (errorEl) errorEl.style.display = 'none';
+
+            preview.onload = function() {
+                const w = preview.naturalWidth || 0;
+                const h = preview.naturalHeight || 0;
+
+                if (w && h) {
+                    if (w === 640 && h === 480) {
+                        if (errorEl) errorEl.style.display = 'none';
+                    } else {
+                        if (errorEl) {
+                            errorEl.textContent = 'A imagem deve ter 640x480 pixels.';
+                            errorEl.style.display = 'block';
+                        }
+                    }
+                } else {
+                    if (errorEl) errorEl.style.display = 'none';
+                }
+                preview.style.display = 'block';
+            };
+
+            preview.onerror = function() {
+                if (errorEl) {
+                    errorEl.textContent = 'Não foi possível carregar a imagem. Verifique o link.';
+                    errorEl.style.display = 'block';
+                }
+                preview.style.display = 'none';
+            };
+        }
+
+        // ---------- Sistema de Autenticação ----------
+        document.getElementById('loginForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            const email = document.getElementById('email').value;
+            const password = document.getElementById('password').value;
+            
+            auth.signInWithEmailAndPassword(email, password)
+                .then((userCredential) => {
+                    currentUser = userCredential.user;
+                    document.body.classList.add('user-logged-in');
+                    showSection('corridas');
+                    loadAllData();
+                })
+                .catch((error) => {
+                    document.getElementById('loginError').textContent = error.message;
+                    document.getElementById('loginError').style.display = 'block';
+                });
+        });
+
+        function logout() {
+            auth.signOut().then(() => {
+                currentUser = null;
+                document.body.classList.remove('user-logged-in');
+                showSection('ranking');
+            });
+        }
+
+        // Verificar estado de autenticação ao carregar a página
+        auth.onAuthStateChanged((user) => {
+            if (user && user.email === 'bioranss@gmail.com') {
+                currentUser = user;
+                document.body.classList.add('user-logged-in');
+                loadAllData();
+            } else {
+                currentUser = null;
+                document.body.classList.remove('user-logged-in');
+                showSection('ranking');
+                loadRankingData();
+            }
+        });
+
+        // ---------- Navegação ----------
+        function showSection(sectionId) {
+            // Esconder todas as seções
+            document.querySelectorAll('.section').forEach(section => {
+                section.classList.remove('active-section');
+            });
+            
+            // Mostrar a seção selecionada
+            document.getElementById(sectionId).classList.add('active-section');
+            
+            // EXECUTAR FILTRO AUTOMATICAMENTE QUANDO ACESSAR RANKING
+            if (sectionId === 'ranking') {
+                setTimeout(filtrarRanking, 100);
+            }
+        }
+
+        // ---------- Funções para Corridas ----------
+        function openCorridaModal(corrida = null) {
+            document.getElementById('corridaId').value = '';
+            document.getElementById('corridaNome').value = '';
+            document.getElementById('corridaData').value = '';
+            document.getElementById('corridaDistancias').value = '';
+            document.getElementById('corridaAltimetrias').value = '';
+            document.getElementById('corridaQtdAtletasFeminino').value = '';
+            document.getElementById('corridaQtdAtletasMasculino').value = '';
+            
+            if (corrida) {
+                document.getElementById('corridaModalTitle').textContent = 'Editar Corrida';
+                document.getElementById('corridaId').value = corrida.id;
+                document.getElementById('corridaNome').value = corrida.nome;
+                document.getElementById('corridaData').value = corrida.data;
+                document.getElementById('corridaDistancias').value = corrida.distancias.join(', ');
+                document.getElementById('corridaAltimetrias').value = corrida.altimetrias.join(', ');
+                document.getElementById('corridaQtdAtletasFeminino').value = corrida.qtdAtletasFeminino.join(', ');
+                document.getElementById('corridaQtdAtletasMasculino').value = corrida.qtdAtletasMasculino.join(', ');
+            } else {
+                document.getElementById('corridaModalTitle').textContent = 'Nova Corrida';
+            }
+        }
+
+        function saveCorrida() {
+            const id = document.getElementById('corridaId').value;
+            const nome = document.getElementById('corridaNome').value;
+            const data = document.getElementById('corridaData').value;
+            const distancias = document.getElementById('corridaDistancias').value.split(',').map(d => d.trim()).filter(d => d);
+            const altimetrias = document.getElementById('corridaAltimetrias').value.split(',').map(a => a.trim()).filter(a => a);
+            const qtdAtletasFeminino = document.getElementById('corridaQtdAtletasFeminino').value.split(',').map(q => q.trim()).filter(q => q);
+            const qtdAtletasMasculino = document.getElementById('corridaQtdAtletasMasculino').value.split(',').map(q => q.trim()).filter(q => q);
+            
+            if (!nome || !data || distancias.length === 0 || altimetrias.length === 0 || 
+                qtdAtletasFeminino.length === 0 || qtdAtletasMasculino.length === 0) {
+                alert('Preencha todos os campos obrigatórios!');
+                return;
+            }
+            
+            // Verificar se as quantidades são iguais
+            if (distancias.length !== altimetrias.length || 
+                distancias.length !== qtdAtletasFeminino.length || 
+                distancias.length !== qtdAtletasMasculino.length) {
+                alert('A quantidade de distâncias, altimetrias e quantidade de atletas deve ser a mesma!');
+                return;
+            }
+            
+            if (id) {
+                // Atualizar corrida existente
+                database.ref('corridas/' + id).update({
+                    nome: nome,
+                    data: data,
+                    distancias: distancias,
+                    altimetrias: altimetrias,
+                    qtdAtletasFeminino: qtdAtletasFeminino,
+                    qtdAtletasMasculino: qtdAtletasMasculino
+                });
+            } else {
+                // Criar nova corrida
+                const newCorridaRef = database.ref('corridas').push();
+                newCorridaRef.set({
+                    nome: nome,
+                    data: data,
+                    distancias: distancias,
+                    altimetrias: altimetrias,
+                    qtdAtletasFeminino: qtdAtletasFeminino,
+                    qtdAtletasMasculino: qtdAtletasMasculino
+                });
+            }
+            
+            // Fechar modal
+            bootstrap.Modal.getInstance(document.getElementById('corridaModal')).hide();
+        }
+
+        function editCorrida(id) {
+            const corrida = corridas.find(c => c.id === id);
+            if (corrida) {
+                openCorridaModal(corrida);
+                bootstrap.Modal.getOrCreateInstance(document.getElementById('corridaModal')).show();
+            }
+        }
+
+        function deleteCorrida(id) {
+            if (confirm('Tem certeza que deseja excluir esta corrida?')) {
+                database.ref('corridas/' + id).remove();
+            }
+        }
+
+        function loadCorridas() {
+            database.ref('corridas').on('value', (snapshot) => {
+                corridas = [];
+                const tbody = document.getElementById('corridasTable');
+                tbody.innerHTML = '';
+                
+                snapshot.forEach((childSnapshot) => {
+                    const corrida = {
+                        id: childSnapshot.key,
+                        ...childSnapshot.val()
+                    };
+                    corridas.push(corrida);
+                    
+                    const row = document.createElement('tr');
+                    row.innerHTML = `
+                        <td>${corrida.nome}</td>
+                        <td>${formatarData(corrida.data)}</td>
+                        <td>${corrida.distancias.join(', ')} km</td>
+                        <td>${corrida.altimetrias.join(', ')} m</td>
+                        <td>
+                            <span class="badge badge-feminino gender-badge">F: ${corrida.qtdAtletasFeminino.join(', ')}</span>
+                            <span class="badge badge-masculino gender-badge">M: ${corrida.qtdAtletasMasculino.join(', ')}</span>
+                        </td>
+                        <td class="table-actions">
+                            <button class="btn btn-sm btn-primary" onclick="editCorrida('${corrida.id}')">
+                                <i class="fas fa-edit"></i>
+                            </button>
+                            <button class="btn btn-sm btn-danger" onclick="deleteCorrida('${corrida.id}')">
+                                <i class="fas fa-trash"></i>
+                            </button>
+                        </td>
+                    `;
+                    tbody.appendChild(row);
+                });
+                
+                updateCorridasDropdown();
+            });
+        }
+
+        // ---------- Funções para Atletas ----------
+        function openAtletaModal(atleta = null) {
+            document.getElementById('atletaId').value = '';
+            document.getElementById('atletaFoto').value = '';
+            document.getElementById('atletaNome').value = '';
+            document.getElementById('atletaNascimento').value = '';
+            document.getElementById('atletaGenero').value = '';
+            document.getElementById('atletaEquipe').value = '';
+            document.getElementById('atletaSobre').value = '';
+            document.getElementById('image-preview').style.display = 'none';
+            
+            if (atleta) {
+                document.getElementById('atletaModalTitle').textContent = 'Editar Atleta';
+                document.getElementById('atletaId').value = atleta.id;
+                document.getElementById('atletaFoto').value = atleta.foto;
+                document.getElementById('atletaNome').value = atleta.nome;
+                document.getElementById('atletaNascimento').value = atleta.nascimento;
+                document.getElementById('atletaGenero').value = atleta.genero;
+                document.getElementById('atletaEquipe').value = atleta.equipe;
+                document.getElementById('atletaSobre').value = atleta.sobre;
+                
+                if (atleta.foto) {
+                    updateImagePreview(atleta.foto);
+                }
+            } else {
+                document.getElementById('atletaModalTitle').textContent = 'Novo Atleta';
+            }
+        }
+
+        function saveAtleta() {
+            const id = document.getElementById('atletaId').value;
+            const foto = document.getElementById('atletaFoto').value;
+            const nome = document.getElementById('atletaNome').value;
+            const nascimento = document.getElementById('atletaNascimento').value;
+            const genero = document.getElementById('atletaGenero').value;
+            const equipe = document.getElementById('atletaEquipe').value;
+            const sobre = document.getElementById('atletaSobre').value;
+            
+            if (!nome || !nascimento || !genero) {
+                alert('Preencha todos os campos obrigatórios!');
+                return;
+            }
+            
+            if (id) {
+                // Atualizar atleta existente
+                database.ref('atletas/' + id).update({
+                    foto: foto,
+                    nome: nome,
+                    nascimento: nascimento,
+                    genero: genero,
+                    equipe: equipe,
+                    sobre: sobre
+                });
+            } else {
+                // Criar novo atleta
+                const newAtletaRef = database.ref('atletas').push();
+                newAtletaRef.set({
+                    foto: foto,
+                    nome: nome,
+                    nascimento: nascimento,
+                    genero: genero,
+                    equipe: equipe,
+                    sobre: sobre
+                });
+            }
+            
+            // Fechar modal
+            bootstrap.Modal.getInstance(document.getElementById('atletaModal')).hide();
+        }
+
+        function editAtleta(id) {
+            const atleta = atletas.find(a => a.id === id);
+            if (atleta) {
+                openAtletaModal(atleta);
+                bootstrap.Modal.getOrCreateInstance(document.getElementById('atletaModal')).show();
+            }
+        }
+
+        function deleteAtleta(id) {
+            if (confirm('Tem certeza que deseja excluir este atleta?')) {
+                database.ref('atletas/' + id).remove();
+            }
+        }
+
+        function loadAtletas() {
+            database.ref('atletas').on('value', (snapshot) => {
+                atletas = [];
+                const tbody = document.getElementById('atletasTable');
+                tbody.innerHTML = '';
+                
+                snapshot.forEach((childSnapshot) => {
+                    const atleta = {
+                        id: childSnapshot.key,
+                        ...childSnapshot.val()
+                    };
+                    atletas.push(atleta);
+                    
+                    const row = document.createElement('tr');
+                    row.innerHTML = `
+                        <td>
+                            ${atleta.foto ? 
+                                `<img src="${normalizeGoogleDriveImage(atleta.foto)}" style="width: 50px; height: 50px; object-fit: cover;" alt="${atleta.nome}">` : 
+                                '<i class="fas fa-user" style="font-size: 24px;"></i>'
+                            }
+                        </td>
+                        <td>${atleta.nome}</td>
+                        <td>${formatarData(atleta.nascimento)}</td>
+                        <td>${atleta.genero}</td>
+                        <td>${atleta.equipe || '-'}</td>
+                        <td class="table-actions">
+                            <button class="btn btn-sm btn-primary" onclick="editAtleta('${atleta.id}')">
+                                <i class="fas fa-edit"></i>
+                            </button>
+                            <button class="btn btn-sm btn-danger" onclick="deleteAtleta('${atleta.id}')">
+                                <i class="fas fa-trash"></i>
+                            </button>
+                        </td>
+                    `;
+                    tbody.appendChild(row);
+                });
+                
+                // Atualizar dropdown de atletas no formulário de registro
+                updateAtletasDropdown();
+            });
+        }
+
+        // ---------- Funções para Registros ----------
+        function openRegistroModal(registro = null) {
+            document.getElementById('registroId').value = '';
+            document.getElementById('registroAtleta').value = '';
+            document.getElementById('registroCorrida').value = '';
+            document.getElementById('registroDistancia').value = '';
+            document.getElementById('registroAltimetria').value = '';
+            document.getElementById('registroQtdAtletas').value = '';
+            document.getElementById('registroPosicao').value = '';
+            document.getElementById('corridaDetails').style.display = 'none';
+            selectedAtletaGenero = '';
+            
+            updateAtletasDropdown();
+            updateCorridasDropdown();
+            
+            if (registro) {
+                document.getElementById('registroModalTitle').textContent = 'Editar Registro';
+                document.getElementById('registroId').value = registro.id;
+                document.getElementById('registroAtleta').value = registro.atletaId;
+                document.getElementById('registroCorrida').value = registro.corridaId;
+                document.getElementById('registroDistancia').value = registro.distancia;
+                document.getElementById('registroAltimetria').value = registro.altimetria;
+                document.getElementById('registroQtdAtletas').value = registro.qtdAtletas;
+                document.getElementById('registroPosicao').value = registro.posicao;
+                
+                // Atualizar gênero do atleta selecionado
+                const atleta = atletas.find(a => a.id === registro.atletaId);
+                if (atleta) {
+                    selectedAtletaGenero = atleta.genero;
+                }
+                
+                // Atualizar detalhes da corrida se já estiver selecionada
+                if (registro.corridaId) {
+                    updateCorridaDetails();
+                }
+            } else {
+                document.getElementById('registroModalTitle').textContent = 'Novo Registro';
+            }
+        }
+
+        function updateAtletaGenero() {
+            const atletaId = document.getElementById('registroAtleta').value;
+            const atleta = atletas.find(a => a.id === atletaId);
+            
+            if (atleta) {
+                selectedAtletaGenero = atleta.genero;
+                document.getElementById('qtdAtletasInfo').textContent = `Gênero do atleta: ${atleta.genero}`;
+                
+                // Atualizar quantidade de atletas baseado no gênero
+                updateQtdAtletasByGenero();
+            } else {
+                selectedAtletaGenero = '';
+                document.getElementById('qtdAtletasInfo').textContent = '';
+            }
+        }
+
+        function updateCorridaDetails() {
+            const corridaId = document.getElementById('registroCorrida').value;
+            const corridaDetails = document.getElementById('corridaDetails');
+            const corridaInfo = document.getElementById('corridaInfo');
+            const distanciaSelect = document.getElementById('registroDistancia');
+            const altimetriaSelect = document.getElementById('registroAltimetria');
+            
+            if (!corridaId) {
+                corridaDetails.style.display = 'none';
+                return;
+            }
+            
+            const corrida = corridas.find(c => c.id === corridaId);
+            if (!corrida) {
+                corridaDetails.style.display = 'none';
+                return;
+            }
+            
+            // Mostrar detalhes da corrida
+            corridaInfo.innerHTML = `
+                <div class="corrida-detail-item"><strong>Nome:</strong> ${corrida.nome}</div>
+                <div class="corrida-detail-item"><strong>Data:</strong> ${formatarData(corrida.data)}</div>
+                <div class="corrida-detail-item"><strong>Distâncias:</strong> ${corrida.distancias.join(', ')} km</div>
+                <div class="corrida-detail-item"><strong>Altimetrias:</strong> ${corrida.altimetrias.join(', ')} m</div>
+                <div class="corrida-detail-item">
+                    <strong>Quantidade de Atletas:</strong> 
+                    <span class="badge badge-feminino gender-badge">F: ${corrida.qtdAtletasFeminino.join(', ')}</span>
+                    <span class="badge badge-masculino gender-badge">M: ${corrida.qtdAtletasMasculino.join(', ')}</span>
+                </div>
+            `;
+            corridaDetails.style.display = 'block';
+            
+            // Atualizar dropdowns de distância e altimetria
+            distanciaSelect.innerHTML = '<option value="">Selecione uma distância</option>';
+            corrida.distancias.forEach(distancia => {
+                const option = document.createElement('option');
+                option.value = distancia;
+                option.textContent = `${distancia} km`;
+                distanciaSelect.appendChild(option);
+            });
+            
+            altimetriaSelect.innerHTML = '<option value="">Selecione uma altimetria</option>';
+            corrida.altimetrias.forEach(altimetria => {
+                const option = document.createElement('option');
+                option.value = altimetria;
+                option.textContent = `${altimetria} m`;
+                altimetriaSelect.appendChild(option);
+            });
+            
+            // Atualizar quantidade de atletas baseado no gênero
+            updateQtdAtletasByGenero();
+        }
+
+        function updateQtdAtletasByGenero() {
+            const corridaId = document.getElementById('registroCorrida').value;
+            const distancia = document.getElementById('registroDistancia').value;
+            const qtdAtletasSelect = document.getElementById('registroQtdAtletas');
+            
+            if (!corridaId || !distancia || !selectedAtletaGenero) {
+                qtdAtletasSelect.innerHTML = '<option value="">Selecione quantidade de atletas</option>';
+                return;
+            }
+            
+            const corrida = corridas.find(c => c.id === corridaId);
+            if (!corrida) return;
+            
+            // Encontrar o índice da distância selecionada
+            const distanciaIndex = corrida.distancias.findIndex(d => d === distancia);
+            if (distanciaIndex === -1) return;
+            
+            // Selecionar a quantidade de atletas baseado no gênero
+            let qtdAtletas;
+            if (selectedAtletaGenero === 'feminino') {
+                qtdAtletas = corrida.qtdAtletasFeminino[distanciaIndex];
+            } else {
+                qtdAtletas = corrida.qtdAtletasMasculino[distanciaIndex];
+            }
+            
+            // Atualizar dropdown de quantidade de atletas
+            qtdAtletasSelect.innerHTML = `<option value="${qtdAtletas}">${qtdAtletas} atletas (${selectedAtletaGenero})</option>`;
+        }
+
+        function saveRegistro() {
+            const id = document.getElementById('registroId').value;
+            const atletaId = document.getElementById('registroAtleta').value;
+            const corridaId = document.getElementById('registroCorrida').value;
+            const distancia = document.getElementById('registroDistancia').value;
+            const altimetria = document.getElementById('registroAltimetria').value;
+            const qtdAtletas = document.getElementById('registroQtdAtletas').value;
+            const posicao = parseInt(document.getElementById('registroPosicao').value);
+            
+            if (!atletaId || !corridaId || !distancia || !altimetria || !qtdAtletas || !posicao) {
+                alert('Preencha todos os campos obrigatórios!');
+                return;
+            }
+            
+            // Calcular pontos
+            const pontos = calcularPontuacao(posicao, parseFloat(distancia), parseInt(altimetria), parseInt(qtdAtletas));
+            
+            if (id) {
+                // Atualizar registro existente
+                database.ref('registros/' + id).update({
+                    atletaId: atletaId,
+                    corridaId: corridaId,
+                    distancia: distancia,
+                    altimetria: altimetria,
+                    posicao: posicao,
+                    qtdAtletas: qtdAtletas,
+                    data: corridas.find(c => c.id === corridaId).data,
+                    pontos: pontos
+                });
+            } else {
+                // Criar novo registro
+                const newRegistroRef = database.ref('registros').push();
+                newRegistroRef.set({
+                    atletaId: atletaId,
+                    corridaId: corridaId,
+                    distancia: distancia,
+                    altimetria: altimetria,
+                    posicao: posicao,
+                    qtdAtletas: qtdAtletas,
+                    data: corridas.find(c => c.id === corridaId).data,
+                    pontos: pontos
+                });
+            }
+            
+            // Fechar modal
+            bootstrap.Modal.getInstance(document.getElementById('registroModal')).hide();
+        }
+
+        function editRegistro(id) {
+            const registro = registros.find(r => r.id === id);
+            if (registro) {
+                openRegistroModal(registro);
+                bootstrap.Modal.getOrCreateInstance(document.getElementById('registroModal')).show();
+            }
+        }
+
+        function deleteRegistro(id) {
+            if (confirm('Tem certeza que deseja excluir este registro?')) {
+                database.ref('registros/' + id).remove();
+            }
+        }
+
+        function loadRegistros() {
+            database.ref('registros').on('value', (snapshot) => {
+                registros = [];
+                const tbody = document.getElementById('registrosTable');
+                tbody.innerHTML = '';
+                
+                snapshot.forEach((childSnapshot) => {
+                    const registro = {
+                        id: childSnapshot.key,
+                        ...childSnapshot.val()
+                    };
+                    registros.push(registro);
+                    
+                    // Encontrar nome do atleta e da corrida
+                    const atleta = atletas.find(a => a.id === registro.atletaId);
+                    const corrida = corridas.find(c => c.id === registro.corridaId);
+                    
+                    const row = document.createElement('tr');
+                    row.innerHTML = `
+                        <td>${atleta ? atleta.nome : 'N/A'}</td>
+                        <td>${corrida ? corrida.nome : 'N/A'}</td>
+                        <td>${registro.distancia} km</td>
+                        <td>${registro.altimetria} m</td>
+                        <td>${registro.posicao}º</td>
+                        <td>${registro.qtdAtletas}</td>
+                        <td>${formatarData(registro.data)}</td>
+                        <td>${registro.pontos.toFixed(2)}</td>
+                        <td class="table-actions">
+                            <button class="btn btn-sm btn-primary" onclick="editRegistro('${registro.id}')">
+                                <i class="fas fa-edit"></i>
+                            </button>
+                            <button class="btn btn-sm btn-danger" onclick="deleteRegistro('${registro.id}')">
+                                <i class="fas fa-trash"></i>
+                            </button>
+                        </td>
+                    `;
+                    tbody.appendChild(row);
+                });
+            });
+        }
+
+        // ---------- Funções para Ranking ----------
+        function calcularPontuacao(posicao, distancia, altimetria, qtdAtletas) {
+            // Pontos Base
+            let pontosBase;
+            if (posicao === 1) pontosBase = 1000;
+            else if (posicao === 2) pontosBase = 850;
+            else if (posicao === 3) pontosBase = 750;
+            else if (posicao >= 4 && posicao <= 10) pontosBase = 600;
+            else if (posicao >= 11 && posicao <= 20) pontosBase = 450;
+            else if (posicao >= 21 && posicao <= 50) pontosBase = 300;
+            else if (posicao >= 51 && posicao <= 100) pontosBase = 150;
+            else if (posicao >= 101) pontosBase = 50;
+            else pontosBase = 25; // Completou
+            
+            // Pontos de Dificuldade
+            const pontosDificuldade = (distancia / 10) + (altimetria / 500);
+            
+            // Multiplicador de Competitividade
+            let multiplicador;
+            if (qtdAtletas <= 50) multiplicador = 1.0;
+            else if (qtdAtletas <= 100) multiplicador = 1.2;
+            else if (qtdAtletas <= 200) multiplicador = 1.5;
+            else if (qtdAtletas <= 500) multiplicador = 1.8;
+            else multiplicador = 2.0;
+            
+            // Pontuação Final
+            return (pontosBase + pontosDificuldade) * multiplicador;
+        }
+
+        function calcularIdade(dataNascimento) {
+            const hoje = new Date();
+            const nascimento = new Date(dataNascimento);
+            let idade = hoje.getFullYear() - nascimento.getFullYear();
+            const mes = hoje.getMonth() - nascimento.getMonth();
+            
+            if (mes < 0 || (mes === 0 && hoje.getDate() < nascimento.getDate())) {
+                idade--;
+            }
+            
+            return idade;
+        }
+
+        function obterFaixaEtaria(idade) {
+            if (idade >= 18 && idade <= 24) return "18-24";
+            if (idade >= 25 && idade <= 34) return "25-34";
+            if (idade >= 35 && idade <= 44) return "35-44";
+            if (idade >= 45 && idade <= 54) return "45-54";
+            if (idade >= 55) return "55+";
+            return "Outros";
+        }
+
+        function filtrarRanking() {
+            const genero = document.getElementById('generoFilter').value;
+            const faixaEtaria = document.getElementById('faixaEtariaFilter').value;
+            const ano = document.getElementById('anoFilter').value;
+            
+            // Calcular pontos por atleta
+            const ranking = calcularRanking(genero, faixaEtaria, ano);
+            
+            // Exibir ranking
+            exibirRanking(ranking);
+        }
+
+        function calcularRanking(genero = 'todos', faixaEtaria = 'todas', ano = new Date().getFullYear().toString()) {
+            const pontosPorAtleta = {};
+            
+            // Processar registros para calcular pontos
+            registros.forEach(registro => {
+                // Filtrar por ano
+                const registroAno = registro.data.split('-')[0];
+                if (ano !== 'todos' && registroAno !== ano) return;
+                
+                const atleta = atletas.find(a => a.id === registro.atletaId);
+                if (!atleta) return;
+                
+                // Filtrar por gênero
+                if (genero !== 'todos' && atleta.genero !== genero) return;
+                
+                // Filtrar por faixa etária
+                if (faixaEtaria !== 'todas') {
+                    const idade = calcularIdade(atleta.nascimento);
+                    const faixa = obterFaixaEtaria(idade);
+                    if (faixa !== faixaEtaria) return;
+                }
+                
+                // Adicionar pontos ao atleta
+                if (!pontosPorAtleta[atleta.id]) {
+                    pontosPorAtleta[atleta.id] = {
+                        atleta: atleta,
+                        pontos: 0,
+                        corridas: 0,
+                        melhorPosicao: Infinity
+                    };
+                }
+                
+                pontosPorAtleta[atleta.id].pontos += registro.pontos;
+                pontosPorAtleta[atleta.id].corridas++;
+                
+                if (registro.posicao < pontosPorAtleta[atleta.id].melhorPosicao) {
+                    pontosPorAtleta[atleta.id].melhorPosicao = registro.posicao;
+                }
+            });
+            
+            // Converter para array e ordenar por pontos
+            return Object.values(pontosPorAtleta)
+                .sort((a, b) => b.pontos - a.pontos);
+        }
+
+        function exibirRanking(ranking) {
+            const grid = document.getElementById('rankingGrid');
+            grid.innerHTML = '';
+            
+            if (ranking.length === 0) {
+                grid.innerHTML = `
+                    <div class="alert alert-info text-center">
+                        <i class="fas fa-info-circle"></i> Nenhum atleta encontrado com os filtros selecionados.
+                    </div>
+                `;
+                return;
+            }
+            
+            ranking.forEach((item, index) => {
+                const atleta = item.atleta;
+                const card = document.createElement('div');
+                card.className = 'athlete-ranking-card';
+                card.onclick = () => showAtletaDetails(atleta.id);
+                
+                // Calcular idade
+                const idade = calcularIdade(atleta.nascimento);
+                const faixaEtaria = obterFaixaEtaria(idade);
+                
+                card.innerHTML = `
+                    <div class="athlete-position">${index + 1}º</div>
+                    <img src="${atleta.foto ? normalizeGoogleDriveImage(atleta.foto) : 'https://via.placeholder.com/70x70?text=🏃'}" 
+                         class="athlete-avatar" alt="${atleta.nome}">
+                    <div class="athlete-info">
+                        <div class="athlete-name">${atleta.nome}</div>
+                        <div class="athlete-stats">
+                            <div class="stat-item">
+                                <i class="fas fa-${atleta.genero === 'masculino' ? 'mars' : 'venus'}"></i>
+                                ${atleta.genero} • ${faixaEtaria}
+                            </div>
+                            <div class="stat-item">
+                                <i class="fas fa-users"></i>
+                                ${atleta.equipe || 'Sem equipe'}
+                            </div>
+                            <div class="stat-item">
+                                <i class="fas fa-flag-checkered"></i>
+                                ${item.corridas} corrida${item.corridas !== 1 ? 's' : ''}
+                            </div>
+                            <div class="stat-item">
+                                <i class="fas fa-trophy"></i>
+                                Melhor: ${item.melhorPosicao}º
+                            </div>
+                        </div>
+                    </div>
+                    <div class="athlete-points">
+                        ${item.pontos.toFixed(2)} pts
+                    </div>
+                `;
+                
+                grid.appendChild(card);
+            });
+        }
+
+        function showAtletaDetails(atletaId) {
+            const atleta = atletas.find(a => a.id === atletaId);
+            if (!atleta) return;
+            
+            // Calcular estatísticas do atleta
+            const registrosAtleta = registros.filter(r => r.atletaId === atletaId);
+            const totalPontos = registrosAtleta.reduce((sum, r) => sum + r.pontos, 0);
+            const melhorPosicao = Math.min(...registrosAtleta.map(r => r.posicao));
+            
+            // Preencher modal
+            document.getElementById('detailAtletaNome').textContent = atleta.nome;
+            document.getElementById('detailAtletaNascimento').textContent = formatarData(atleta.nascimento);
+            document.getElementById('detailAtletaGenero').textContent = atleta.genero;
+            document.getElementById('detailAtletaEquipe').textContent = atleta.equipe || 'N/A';
+            document.getElementById('detailAtletaSobre').textContent = atleta.sobre || 'N/A';
+            document.getElementById('detailAtletaPontos').textContent = totalPontos.toFixed(2);
+            document.getElementById('detailAtletaCorridas').textContent = registrosAtleta.length;
+            document.getElementById('detailAtletaMelhorPosicao').textContent = melhorPosicao + 'º';
+            
+            if (atleta.foto) {
+                document.getElementById('detailAtletaFoto').src = normalizeGoogleDriveImage(atleta.foto);
+            } else {
+                document.getElementById('detailAtletaFoto').src = 'https://via.placeholder.com/300x300?text=Sem+Imagem';
+            }
+            
+            // Preencher histórico
+            const tbody = document.getElementById('detailAtletaHistorico');
+            tbody.innerHTML = '';
+            
+            registrosAtleta.forEach(registro => {
+                const corrida = corridas.find(c => c.id === registro.corridaId);
+                const row = document.createElement('tr');
+                row.innerHTML = `
+                    <td>${corrida ? corrida.nome : 'N/A'}</td>
+                    <td>${formatarData(registro.data)}</td>
+                    <td>${registro.distancia} km</td>
+                    <td>${registro.posicao}º</td>
+                    <td>${registro.pontos.toFixed(2)}</td>
+                `;
+                tbody.appendChild(row);
+            });
+            
+            // Mostrar modal
+            bootstrap.Modal.getOrCreateInstance(document.getElementById('atletaDetailModal')).show();
+        }
+
+        function loadRankingData() {
+            // Carregar anos para o filtro
+            const anoSelect = document.getElementById('anoFilter');
+            const currentYear = new Date().getFullYear();
+            
+            anoSelect.innerHTML = '<option value="todos">Todos</option>';
+            for (let year = currentYear; year >= currentYear - 5; year--) {
+                const option = document.createElement('option');
+                option.value = year;
+                option.textContent = year;
+                if (year === currentYear) option.selected = true;
+                anoSelect.appendChild(option);
+            }
+            
+            // EXECUTAR FILTRO AUTOMATICAMENTE - Adicione esta linha
+            filtrarRanking();
+        }
+
+        // ---------- Funções Auxiliares ----------
+        function formatarData(dateStr) {
+            if (!dateStr) return 'N/A';
+            const [year, month, day] = dateStr.split('-').map(Number);
+            const date = new Date(year, month - 1, day);
+            return date.toLocaleDateString('pt-BR');
+        }
+
+        function updateAtletasDropdown() {
+            const select = document.getElementById('registroAtleta');
+            select.innerHTML = '<option value="">Selecione um atleta</option>';
+            
+            atletas.forEach(atleta => {
+                const option = document.createElement('option');
+                option.value = atleta.id;
+                option.textContent = atleta.nome;
+                select.appendChild(option);
+            });
+        }
+
+        function updateCorridasDropdown() {
+            const select = document.getElementById('registroCorrida');
+            if (!select) return;
+            select.innerHTML = '<option value="">Selecione uma corrida</option>';
+            
+            corridas.forEach(corrida => {
+                const option = document.createElement('option');
+                option.value = corrida.id;
+                option.textContent = corrida.nome;
+                select.appendChild(option);
+            });
+        }
+
+        function loadAllData() {
+            loadCorridas();
+            loadAtletas();
+            loadRegistros();
+            
+            // Atualizar dropdowns após carregar dados
+            setTimeout(() => {
+                updateAtletasDropdown();
+                updateCorridasDropdown();
+                console.log('Dados carregados - Atletas:', atletas.length, 'Corridas:', corridas.length);
+                
+                // EXECUTAR FILTRO AUTOMATICAMENTE - Adicione esta linha
+                filtrarRanking();
+            }, 1500);
+        }
+
+        // Inicialização
+        document.addEventListener('DOMContentLoaded', function() {
+            // Carregar dados iniciais
+            if (currentUser) {
+                loadAllData();
+            } else {
+                loadRankingData();
+            }
+        });
+    </script>
+</body>
+</html>
