@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Ranking Trail Ubatuba - Visualização</title>
+    <title>Ranking Trail Ubatuba - Comunidade Trail Run</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
@@ -11,36 +11,24 @@
             --primary-color: #1e7e34;
             --secondary-color: #0d6efd;
             --accent-color: #fd7e14;
+            --trail-color: #28a745;
+            --mountain-color: #6f42c1;
         }
         
         body {
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background-color: #f8f9fa;
-            padding-top: 20px;
+            background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+            min-height: 100vh;
+            padding-top: 0;
         }
         
-        .loading-spinner {
-            display: inline-block;
-            width: 20px;
-            height: 20px;
-            border: 3px solid rgba(255,255,255,.3);
-            border-radius: 50%;
-            border-top-color: #fff;
-            animation: spin 1s ease-in-out infinite;
-            margin-right: 8px;
-        }
-
-        @keyframes spin {
-            to { transform: rotate(360deg); }
-        }
-
         .loading-overlay {
             position: fixed;
             top: 0;
             left: 0;
             width: 100%;
             height: 100%;
-            background: rgba(255,255,255,0.8);
+            background: rgba(255,255,255,0.9);
             display: flex;
             justify-content: center;
             align-items: center;
@@ -48,199 +36,405 @@
             display: none;
         }
         
-        /* Navbar simplificada */
-        .navbar-brand img {
-            height: 40px;
+        /* Navbar aprimorada */
+        .navbar {
+            background: linear-gradient(135deg, #1e7e34 0%, #155d27 100%) !important;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+            padding: 10px 0;
         }
         
-        .navbar {
-            background-color: white !important;
-            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        .navbar-brand img {
+            height: 50px;
+            filter: brightness(0) invert(1);
         }
         
         .navbar-nav .nav-link {
-            color: #333 !important;
+            color: rgba(255,255,255,0.9) !important;
+            font-weight: 500;
+            padding: 8px 20px !important;
+            margin: 0 5px;
+            border-radius: 20px;
+            transition: all 0.3s ease;
         }
         
-        .navbar-nav .nav-link:hover {
-            color: var(--primary-color) !important;
+        .navbar-nav .nav-link:hover,
+        .navbar-nav .nav-link.active {
+            color: white !important;
+            background-color: rgba(255,255,255,0.15);
         }
         
         .section {
             display: none;
-            padding: 20px;
+            padding: 100px 0;
+            animation: fadeIn 0.5s ease;
+        }
+        
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
         }
         
         .active-section {
             display: block;
         }
+
+/* Ajuste específico para a seção de ranking */
+#ranking {
+    padding-top: 100px; /* Garante padding extra no ranking */
+}
+
+/* Ajuste específico para a seção Como Funciona */
+#como-funciona {
+    padding-top: 100px; /* Garante padding extra */
+}
+
+/* Para a seção início, mantenha o padding original */
+#inicio {
+    padding-top: 0; /* A hero section já tem seu próprio padding */
+}
         
+        /* Hero Section */
+        .hero-section {
+            background: linear-gradient(rgba(0,0,0,0.7), rgba(0,0,0,0.7)), url('https://images.unsplash.com/photo-1546483875-ad9014c88eba?ixlib=rb-1.2.1&auto=format&fit=crop&w=1920&q=80');
+            background-size: cover;
+            background-position: center;
+            color: white;
+            padding: 120px 100;
+ 	    margin-top: 0;
+            border-radius: 0 0 20px 20px;
+            margin-bottom: 40px;
+        }
+        
+        .hero-section h1 {
+            font-size: 3.5rem;
+            font-weight: 800;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.5);
+        }
+        
+        .hero-section .lead {
+            font-size: 1.3rem;
+            opacity: 0.9;
+        }
+        
+        /* Cards gerais */
         .card {
-            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-            margin-bottom: 20px;
             border: none;
+            border-radius: 15px;
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.1);
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+            margin-bottom: 25px;
+            overflow: hidden;
+        }
+        
+        .card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 15px 35px rgba(0, 0, 0, 0.15);
         }
         
         .card-header {
-            background-color: var(--primary-color);
+            background: linear-gradient(135deg, var(--primary-color), #155d27);
             color: white;
-            font-weight: bold;
+            font-weight: 600;
+            padding: 15px 25px;
+            border-bottom: none;
         }
         
-        .athlete-grid {
-            display: flex;
-            flex-direction: column;
-            gap: 15px;
-            margin-top: 20px;
-        }
+        /* Cards de atletas */
 
-        .athlete-ranking-card {
-            display: flex;
-            align-items: center;
-            padding: 15px;
-            background-color: white;
-            border-radius: 12px;
-            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
-            transition: transform 0.2s;
-            cursor: pointer;
-        }
+.athlete-grid {
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+    margin-top: 30px;
+}
 
-        .athlete-ranking-card:hover {
-            transform: translateY(-2px);
-        }
+.athlete-ranking-card {
+    display: flex;
+    align-items: center;
+    padding: 20px;
+    background-color: white;
+    border-radius: 15px;
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+    cursor: pointer;
+    width: 100%; /* Garante que ocupa toda a largura */
+    position: relative;
+    overflow: hidden;
+}
 
-        .athlete-avatar {
-            width: 70px;
-            height: 70px;
-            border-radius: 50%;
-            object-fit: cover;
-            border: 3px solid var(--primary-color);
-            margin-right: 15px;
-        }
+.athlete-ranking-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 12px 25px rgba(0, 0, 0, 0.15);
+}
 
-        .athlete-info {
-            flex: 1;
-        }
+.athlete-ranking-card::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 6px;
+    height: 100%;
+    background: linear-gradient(to bottom, var(--primary-color), var(--accent-color));
+}
 
-        .athlete-position {
-            font-size: 1.5rem;
-            font-weight: bold;
-            color: var(--primary-color);
-            margin-right: 10px;
-            min-width: 40px;
-        }
+/* Mantenha estas regras (elas estão boas): */
+.athlete-position {
+    font-size: 1.8rem;
+    font-weight: 800;
+    color: var(--primary-color);
+    margin-right: 25px;
+    min-width: 70px;
+    text-align: center;
+}
 
-        .athlete-name {
-            font-size: 1.2rem;
-            font-weight: bold;
-            margin-bottom: 5px;
-        }
+.athlete-avatar {
+    width: 85px;
+    height: 85px;
+    border-radius: 50%;
+    object-fit: cover;
+    border: 4px solid #f8f9fa;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+    margin-right: 25px;
+}
 
-        .athlete-stats {
-            display: flex;
-            gap: 15px;
-            flex-wrap: wrap;
-        }
+.athlete-info {
+    flex: 1;
+    min-width: 0; /* Permite que o texto quebre corretamente */
+}
 
-        .stat-item {
-            display: flex;
-            align-items: center;
-            gap: 5px;
-            font-size: 0.9rem;
-            color: #666;
-        }
+.athlete-name {
+    font-size: 1.4rem;
+    font-weight: 700;
+    margin-bottom: 10px;
+    color: #333;
+}
 
-        .stat-item i {
-            color: var(--primary-color);
-        }
+.athlete-stats {
+    display: flex;
+    gap: 20px;
+    flex-wrap: wrap;
+    margin-bottom: 12px;
+}
 
-        .athlete-points {
-            font-size: 1.3rem;
-            font-weight: bold;
-            color: var(--primary-color);
-            min-width: 100px;
-            text-align: right;
-        }
+.stat-item {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 0.9rem;
+    color: #666;
+    background: #f8f9fa;
+    padding: 6px 14px;
+    border-radius: 15px;
+}
+
+.stat-item i {
+    color: var(--primary-color);
+}
+
+.athlete-points {
+    font-size: 1.7rem;
+    font-weight: 800;
+    color: var(--primary-color);
+    text-align: right;
+    min-width: 140px;
+    padding-left: 20px;
+}
+
+.athlete-points small {
+    font-size: 0.9rem;
+    font-weight: 500;
+    display: block;
+    margin-top: 5px;
+}
+
+/* Ajustes para responsividade */
+@media (max-width: 992px) {
+    .athlete-points {
+        min-width: 120px;
+        font-size: 1.5rem;
+    }
+    
+    .athlete-stats {
+        gap: 15px;
+    }
+}
+
+@media (max-width: 768px) {
+    .athlete-ranking-card {
+        flex-direction: column;
+        text-align: center;
+        padding: 25px 20px;
+    }
+    
+    .athlete-position {
+        margin-right: 0;
+        margin-bottom: 15px;
+        order: 1;
+    }
+    
+    .athlete-avatar {
+        margin-right: 0;
+        margin-bottom: 20px;
+        order: 2;
+    }
+    
+    .athlete-info {
+        order: 3;
+        margin-bottom: 20px;
+        width: 100%;
+    }
+    
+    .athlete-stats {
+        justify-content: center;
+        gap: 12px;
+    }
+    
+    .athlete-points {
+        text-align: center;
+        margin-top: 10px;
+        min-width: auto;
+        padding-left: 0;
+        order: 4;
+        width: 100%;
+        border-top: 1px solid #eee;
+        padding-top: 15px;
+    }
+    
+    .athlete-ranking-card::before {
+        width: 100%;
+        height: 6px;
+        top: 0;
+        left: 0;
+        background: linear-gradient(to right, var(--primary-color), var(--accent-color));
+    }
+}
+
+@media (max-width: 480px) {
+    .athlete-stats {
+        flex-direction: column;
+        align-items: center;
+        gap: 10px;
+    }
+    
+    .stat-item {
+        width: 100%;
+        justify-content: center;
+    }
+}
         
+        /* Filtros */
         .filter-section {
-            background-color: white;
-            padding: 15px;
-            border-radius: 8px;
-            margin-bottom: 20px;
-            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-        }
-        
-        .btn-primary {
-            background-color: var(--primary-color);
-            border-color: var(--primary-color);
-        }
-        
-        .btn-primary:hover {
-            background-color: #1a6c2d;
-            border-color: #1a6c2d;
-        }
-        
-        .athlete-modal-img {
-            width: 100%;
-            max-height: 300px;
-            object-fit: cover;
-            border-radius: 8px;
-        }
-        
-        .corrida-details {
-            background-color: #f8f9fa;
-            border-radius: 8px;
-            padding: 15px;
-            margin-top: 15px;
-        }
-        
-        .corrida-detail-item {
-            margin-bottom: 10px;
-        }
-        
-        .gender-badge {
-            font-size: 0.8rem;
-            padding: 3px 8px;
-            border-radius: 12px;
-        }
-        
-        .badge-feminino {
-            background-color: #e83e8c;
-            color: white;
-        }
-        
-        .badge-masculino {
-            background-color: #007bff;
-            color: white;
-        }
-        
-        .form-text.small {
-            font-size: 0.8rem;
-        }
-        
-        .welcome-section {
-            background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+            background: white;
+            padding: 25px;
             border-radius: 15px;
-            padding: 40px 30px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.08);
             margin-bottom: 30px;
         }
         
+        .filter-section label {
+            font-weight: 600;
+            color: #555;
+            margin-bottom: 8px;
+        }
+        
+        .btn-primary {
+            background: linear-gradient(135deg, var(--primary-color), #155d27);
+            border: none;
+            padding: 10px 25px;
+            font-weight: 600;
+            border-radius: 10px;
+            transition: all 0.3s ease;
+        }
+        
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(30, 126, 52, 0.4);
+        }
+        
+        /* Seção Como Funciona */
+        .factor-card {
+            height: 100%;
+            border-left: 4px solid var(--primary-color);
+        }
+        
+        .factor-icon {
+            font-size: 2.8rem;
+            margin-bottom: 20px;
+            color: var(--primary-color);
+        }
+        
+        .formula-box {
+            background: linear-gradient(135deg, #f8f9fa, #e9ecef);
+            border-left: 4px solid var(--primary-color);
+            padding: 20px;
+            margin: 20px 0;
+            border-radius: 0 10px 10px 0;
+            font-family: 'Courier New', monospace;
+            font-size: 1.1rem;
+        }
+        
+        .accordion-button {
+            font-weight: 600;
+            padding: 15px 20px;
+        }
+        
+        .accordion-button:not(.collapsed) {
+            background-color: rgba(30, 126, 52, 0.1);
+            color: var(--primary-color);
+        }
+        
+        /* Estatísticas gerais */
+        .stats-card {
+            text-align: center;
+            padding: 30px 20px;
+            background: linear-gradient(135deg, #f8f9fa, #e9ecef);
+        }
+        
+        .stats-number {
+            font-size: 2.5rem;
+            font-weight: 800;
+            color: var(--primary-color);
+            margin: 10px 0;
+        }
+        
+        /* Modal */
+        .athlete-modal-img {
+            width: 100%;
+            height: 250px;
+            object-fit: cover;
+            border-radius: 10px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+        }
+        
         /* Responsividade */
+        @media (max-width: 992px) {
+            .hero-section h1 {
+                font-size: 2.5rem;
+            }
+            
+            .athlete-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+        
         @media (max-width: 768px) {
+            .hero-section {
+                padding: 60px 0;
+            }
+            
             .athlete-ranking-card {
                 flex-direction: column;
                 text-align: center;
-                padding: 20px;
+            }
+            
+            .athlete-position {
+                margin-right: 0;
+                margin-bottom: 15px;
             }
             
             .athlete-avatar {
                 margin-right: 0;
                 margin-bottom: 15px;
-            }
-            
-            .athlete-position {
-                margin-right: 0;
-                margin-bottom: 10px;
             }
             
             .athlete-stats {
@@ -249,20 +443,62 @@
             
             .athlete-points {
                 text-align: center;
-                margin-top: 10px;
+                margin-top: 15px;
             }
-            
-            .stat-item {
-                margin-bottom: 5px;
-            }
+        }
+        
+        /* Animações */
+        .pulse {
+            animation: pulse 2s infinite;
+        }
+        
+        @keyframes pulse {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.05); }
+            100% { transform: scale(1); }
+        }
+        
+        /* Footer */
+        .footer {
+            background: linear-gradient(135deg, #1a1a1a, #2d2d2d);
+            color: white;
+            padding: 50px 0 20px;
+            margin-top: 60px;
+        }
+        
+        .footer a {
+            color: #ddd;
+            text-decoration: none;
+            transition: color 0.3s ease;
+        }
+        
+        .footer a:hover {
+            color: var(--primary-color);
+        }
+        
+        .social-icons a {
+            display: inline-block;
+            width: 40px;
+            height: 40px;
+            background: rgba(255,255,255,0.1);
+            border-radius: 50%;
+            text-align: center;
+            line-height: 40px;
+            margin-right: 10px;
+            transition: all 0.3s ease;
+        }
+        
+        .social-icons a:hover {
+            background: var(--primary-color);
+            transform: translateY(-3px);
         }
     </style>
 </head>
 <body>
-    <!-- Navbar simplificada -->
-    <nav class="navbar navbar-expand-lg navbar-light">
+    <!-- Navbar -->
+    <nav class="navbar navbar-expand-lg navbar-dark fixed-top">
         <div class="container">
-            <a class="navbar-brand" href="#">
+            <a class="navbar-brand" href="#" onclick="showSection('inicio')">
                 <img src="Logo_RTU.png" alt="Ranking Trail Ubatuba">
             </a>
             <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
@@ -271,113 +507,167 @@
             <div class="collapse navbar-collapse" id="navbarNav">
                 <ul class="navbar-nav ms-auto">
                     <li class="nav-item">
-                        <a class="nav-link" href="#" onclick="showSection('welcome')">Início</a>
+                        <a class="nav-link active" href="#" onclick="showSection('inicio')">Início</a>
                     </li>
                     <li class="nav-item">
                         <a class="nav-link" href="#" onclick="showSection('ranking')">Ranking</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="#" onclick="showSection('como-funciona')">Como Funciona</a>
                     </li>
                 </ul>
             </div>
         </div>
     </nav>
 
-    <!-- Seções do site -->
-    <div class="container mt-4">
-        <!-- Seção de Boas-vindas -->
-        <div id="welcome" class="section active-section">
-            <!-- Card informativo -->
-            <div class="card mb-4 border-primary">
-                <div class="card-body">
-                    <h4 class="card-title text-primary">
-                        <i class="fas fa-info-circle me-2"></i>Sobre o Ranking
-                    </h4>
-                    
-                    <p class="card-text">
-                        Este não é um ranking de disputa, mas sim uma <strong>celebração do talento</strong> que temos em Ubatuba! 
-                        Nossa missão é dar visibilidade aos atletas que representam nossa cidade nas trilhas e montanhas do Brasil e do mundo.
-                    </p>
-                    
-                    <div class="row mt-3">
-                        <div class="col-md-6">
-                            <h6><i class="fas fa-flag-checkered text-success me-2"></i>Sobre o Ranking</h6>
-                            <ul class="small">
-                                <li>Prioriza atletas de trail running</li>
-                                <li>Considera todas as provas disputadas</li>
-                                <li>Em breve: novos segmentos</li>
-                            </ul>
-                        </div>
-                        <div class="col-md-6">
-                            <h6><i class="fas fa-calculator text-warning me-2"></i>Como funciona?</h6>
-                            <ul class="small">
-                                <li>Baseado nos dados do <strong>Strava</strong></li>
-                                <li>Categorização automática por dificuldade</li>
-                                <li>Pontuação considera desempenho e nível da prova</li>
-                            </ul>
-                        </div>
-                    </div>
-                    
-                    <div class="alert alert-light mt-3">
-                        <h6 class="mb-2"><i class="fas fa-share-alt text-info me-2"></i>Quer participar?</h6>
-                        <p class="mb-2">
-                            Envie os dados da sua corrida pelo direct 
-                            <a href="https://instagram.com/rtu" target="_blank" class="text-primary fw-bold">
-                                <i class="fab fa-instagram me-1"></i>@rtu
-                            </a>
-                        </p>
-                        <small class="text-muted">
-                            <i class="fas fa-check-circle text-success me-1"></i>
-                            Requisitos: registro no Strava + site oficial de resultados
-                        </small>
-                    </div>
+    <!-- Seção Início -->
+    <section id="inicio" class="section active-section">
+        <!-- Hero -->
+        <div class="hero-section">
+            <div class="container text-center">
+                <h1>RANKING TRAIL UBATUBA</h1>
+                <p class="lead">Celebrando o talento dos atletas de trail running de Ubatuba</p>
+                <div class="mt-4">
+                    <button class="btn btn-light btn-lg me-3" onclick="showSection('ranking')">
+                        <i class="fas fa-trophy me-2"></i>Ver Ranking
+                    </button>
+                    <button class="btn btn-outline-light btn-lg" onclick="showSection('como-funciona')">
+                        <i class="fas fa-info-circle me-2"></i>Como Funciona
+                    </button>
+                </div>
+            </div>
+        </div>
 
-                    <!-- Botão Ver Ranking -->
-                    <div class="text-center mt-4">
-                        <button class="btn btn-primary btn-lg" onclick="showSection('ranking')">
-                            <i class="fas fa-trophy me-2"></i>Ver Ranking
-                        </button>
+        <div class="container">
+            <!-- Sobre o Ranking -->
+            <div class="card mb-4 border-0">
+                <div class="card-body p-5">
+                    <div class="row align-items-center">
+                        <div class="col-lg-8">
+                            <h2 class="text-primary mb-4">Não é uma disputa, é uma celebração!</h2>
+                            <p class="lead mb-4">
+                                O Ranking Trail Ubatuba nasceu para dar visibilidade aos atletas que representam nossa 
+                                cidade nas trilhas e montanhas do Brasil e do mundo. Aqui, cada conquista é valorizada.
+                            </p>
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <h5><i class="fas fa-flag-checkered text-success me-2"></i>Sobre o Ranking</h5>
+                                    <ul>
+                                        <li>Foco em atletas de trail running</li>
+                                        <li>Considera todas as provas disputadas</li>
+                                        <li>Em breve: novos segmentos</li>
+                                    </ul>
+                                </div>
+                                <div class="col-md-6">
+                                    <h5><i class="fas fa-calculator text-warning me-2"></i>Como funciona?</h5>
+                                    <ul>
+                                        <li>Baseado nos dados do Strava</li>
+                                        <li>Categorização automática</li>
+                                        <li>Pontuação balanceada</li>
+                                    </ul>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-lg-4 text-center">
+                            <i class="fas fa-mountain fa-10x text-primary opacity-25"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Estatísticas Gerais -->
+            <div class="row mb-4">
+                <div class="col-md-3">
+                    <div class="card stats-card">
+                        <i class="fas fa-users fa-3x text-primary"></i>
+                        <div class="stats-number" id="totalAtletas">0</div>
+                        <p>Atletas Cadastrados</p>
+                    </div>
+                </div>
+                <div class="col-md-3">
+                    <div class="card stats-card">
+                        <i class="fas fa-flag-checkered fa-3x text-success"></i>
+                        <div class="stats-number" id="totalCorridas">0</div>
+                        <p>Corridas Registradas</p>
+                    </div>
+                </div>
+                <div class="col-md-3">
+                    <div class="card stats-card">
+                        <i class="fas fa-mountain fa-3x text-warning"></i>
+                        <div class="stats-number" id="totalTrail">0</div>
+                        <p>Corridas de Trail</p>
+                    </div>
+                </div>
+                <div class="col-md-3">
+                    <div class="card stats-card">
+                        <i class="fas fa-road fa-3x text-secondary"></i>
+                        <div class="stats-number" id="totalEstrada">0</div>
+                        <p>Corridas de Estrada</p>
                     </div>
                 </div>
             </div>
 
             <!-- Destaques -->
-            <div class="row mt-4">
-                <div class="col-md-4 mb-3">
-                    <div class="card h-100 border-0 shadow-sm">
-                        <div class="card-body text-center">
-                            <i class="fas fa-users fa-3x text-primary mb-3"></i>
-                            <h5>Comunidade</h5>
-                            <p class="small">Unindo atletas de trail running de Ubatuba</p>
+            <h3 class="text-center mb-4">Nossos Pilares</h3>
+            <div class="row">
+                <div class="col-md-4 mb-4">
+                    <div class="card h-100 text-center border-0 shadow-sm">
+                        <div class="card-body p-4">
+                            <i class="fas fa-users fa-4x text-primary mb-3"></i>
+                            <h4>Comunidade</h4>
+                            <p>Unindo atletas de trail running de Ubatuba em uma rede de apoio e incentivo.</p>
                         </div>
                     </div>
                 </div>
-                <div class="col-md-4 mb-3">
-                    <div class="card h-100 border-0 shadow-sm">
-                        <div class="card-body text-center">
-                            <i class="fas fa-chart-line fa-3x text-success mb-3"></i>
-                            <h5>Transparência</h5>
-                            <p class="small">Sistema de pontuação claro e objetivo</p>
+                <div class="col-md-4 mb-4">
+                    <div class="card h-100 text-center border-0 shadow-sm">
+                        <div class="card-body p-4">
+                            <i class="fas fa-chart-line fa-4x text-success mb-3"></i>
+                            <h4>Transparência</h4>
+                            <p>Sistema de pontuação claro, objetivo e aberto para verificação de todos.</p>
                         </div>
                     </div>
                 </div>
-                <div class="col-md-4 mb-3">
-                    <div class="card h-100 border-0 shadow-sm">
-                        <div class="card-body text-center">
-                            <i class="fas fa-medal fa-3x text-warning mb-3"></i>
-                            <h5>Reconhecimento</h5>
-                            <p class="small">Valorizando cada conquista dos atletas</p>
+                <div class="col-md-4 mb-4">
+                    <div class="card h-100 text-center border-0 shadow-sm">
+                        <div class="card-body p-4">
+                            <i class="fas fa-medal fa-4x text-warning mb-3 pulse"></i>
+                            <h4>Reconhecimento</h4>
+                            <p>Valorizamos cada conquista, do primeiro ao último colocado.</p>
                         </div>
                     </div>
                 </div>
             </div>
-        </div>
 
-        <!-- Seção de Ranking -->
-        <div id="ranking" class="section">
-            <h2 class="mb-4">Ranking de Atletas</h2>
-            
+            <!-- Participar -->
+            <div class="card border-primary mt-4">
+                <div class="card-body text-center p-5">
+                    <h3 class="text-primary mb-3">Quer fazer parte do ranking?</h3>
+                    <p class="lead mb-4">Envie os dados da sua corrida e vamos juntos fortalecer a comunidade de trail de Ubatuba!</p>
+                    <a href="https://instagram.com/rtu.oficial" target="_blank" class="btn btn-primary btn-lg">
+                        <i class="fab fa-instagram me-2"></i>@rtu.oficial
+                    </a>
+                    <p class="mt-3 text-muted">
+                        <i class="fas fa-check-circle text-success me-1"></i>
+                        Requisitos: registro no Strava + site oficial de resultados
+                    </p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Seção Ranking -->
+    <section id="ranking" class="section">
+        <div class="container">
+            <div class="text-center mb-5">
+                <h1 class="text-primary">Ranking de Atletas</h1>
+                <p class="lead">Veja a classificação completa dos atletas de trail running de Ubatuba</p>
+            </div>
+
+            <!-- Filtros -->
             <div class="filter-section">
-                <div class="row">
-                    <div class="col-md-2">
+                <div class="row g-3">
+                    <div class="col-md-6 col-lg-3">
                         <label for="generoFilter" class="form-label">Gênero</label>
                         <select class="form-select" id="generoFilter">
                             <option value="todos">Todos</option>
@@ -385,7 +675,7 @@
                             <option value="feminino">Feminino</option>
                         </select>
                     </div>
-                    <div class="col-md-2">
+                    <div class="col-md-6 col-lg-3">
                         <label for="faixaEtariaFilter" class="form-label">Faixa Etária</label>
                         <select class="form-select" id="faixaEtariaFilter">
                             <option value="todas">Todas</option>
@@ -396,13 +686,13 @@
                             <option value="55+">55+</option>
                         </select>
                     </div>
-                    <div class="col-md-2">
+                    <div class="col-md-6 col-lg-3">
                         <label for="anoFilter" class="form-label">Ano</label>
                         <select class="form-select" id="anoFilter">
-                            <!-- Anos serão carregados via JavaScript -->
+                            <!-- Anos carregados via JavaScript -->
                         </select>
                     </div>
-                    <div class="col-md-2">
+                    <div class="col-md-6 col-lg-3">
                         <label for="categoriaFilter" class="form-label">Categoria</label>
                         <select class="form-select" id="categoriaFilter">
                             <option value="todas">Todas</option>
@@ -410,31 +700,419 @@
                             <option value="estrada">Apenas Estrada</option>
                         </select>
                     </div>
-                    <div class="col-md-2 d-flex align-items-end">
-                        <button class="btn btn-primary w-100" onclick="filtrarRanking()">
-                            <i class="fas fa-filter"></i> Filtrar
-                        </button>
-                    </div>
-                    <div class="col-md-2 d-flex align-items-end">
-                        <button class="btn btn-outline-secondary w-100" onclick="resetarFiltros()">
-                            <i class="fas fa-redo"></i> Limpar
-                        </button>
+                    <div class="col-12 mt-3">
+                        <div class="d-flex gap-2">
+                            <button class="btn btn-primary flex-grow-1" onclick="filtrarRanking()">
+                                <i class="fas fa-filter me-2"></i>Aplicar Filtros
+                            </button>
+                            <button class="btn btn-outline-secondary" onclick="resetarFiltros()">
+                                <i class="fas fa-redo me-2"></i>Limpar
+                            </button>
+                        </div>
                     </div>
                 </div>
             </div>
-            
+
+            <!-- Grid de Atletas -->
             <div class="athlete-grid" id="rankingGrid">
                 <!-- Atletas carregados via JavaScript -->
             </div>
+
+            <!-- Mensagem sem resultados -->
+            <div id="noResults" class="text-center py-5" style="display: none;">
+                <i class="fas fa-search fa-4x text-muted mb-3"></i>
+                <h3>Nenhum atleta encontrado</h3>
+                <p class="text-muted">Tente ajustar os filtros para ver mais resultados</p>
+            </div>
+        </div>
+    </section>
+
+    <!-- Seção Como Funciona -->
+    <section id="como-funciona" class="section">
+        <div class="container">
+            <div class="text-center mb-5">
+                <h1 class="text-primary">Como Funciona a Pontuação</h1>
+                <p class="lead">Transparência total na nossa fórmula de cálculo</p>
+            </div>
+
+            <!-- Fórmula Principal -->
+            <div class="card mb-5 border-primary">
+                <div class="card-header bg-primary text-white">
+                    <h4 class="mb-0">
+                        <i class="fas fa-square-root-alt me-2"></i>Fórmula de Pontuação
+                    </h4>
+                </div>
+                <div class="card-body">
+                    <div class="formula-box">
+                        <h5 class="mb-3">Pontuação = Base × Colocação × Competitividade × Distância × Altimetria × Ritmo</h5>
+                        <p class="mb-0">Cada componente ajusta os pontos conforme características específicas da prova e do desempenho do atleta.</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Componentes -->
+            <h3 class="mb-4">Componentes da Fórmula</h3>
+            <div class="row mb-5">
+                <div class="col-md-6 col-lg-4 mb-4">
+                    <div class="card factor-card h-100">
+                        <div class="card-body text-center p-4">
+                            <div class="factor-icon">
+                                <i class="fas fa-layer-group"></i>
+                            </div>
+                            <h5>Pontuação Base</h5>
+                            <p>Valor inicial por categoria da prova:</p>
+                            <div class="table-responsive">
+                                <table class="table table-sm">
+                                    <tbody>
+                                        <tr><td><span class="badge bg-secondary">Estrada</span></td><td>50 pts</td></tr>
+                                        <tr><td><span class="badge bg-success">Trail Leve</span></td><td>75 pts</td></tr>
+                                        <tr><td><span class="badge bg-warning">Trail Moderado</span></td><td>100 pts</td></tr>
+                                        <tr><td><span class="badge bg-danger">Trail Pesado</span></td><td>150 pts</td></tr>
+                                        <tr><td><span class="badge bg-dark">Trail Extremo</span></td><td>200 pts</td></tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="col-md-6 col-lg-4 mb-4">
+                    <div class="card factor-card h-100">
+                        <div class="card-body text-center p-4">
+                            <div class="factor-icon">
+                                <i class="fas fa-medal"></i>
+                            </div>
+                            <h5>Fator Colocação</h5>
+                            <p>Baseado na posição relativa na prova:</p>
+                            <div class="formula-box small">
+                                f = 1 - (posição - 1) / total_atletas
+                            </div>
+                            <div class="mt-3">
+                                <strong>1º lugar:</strong> ~0.995<br>
+                                <strong>Último:</strong> 0.1 (mínimo)
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="col-md-6 col-lg-4 mb-4">
+                    <div class="card factor-card h-100">
+                        <div class="card-body text-center p-4">
+                            <div class="factor-icon">
+                                <i class="fas fa-users"></i>
+                            </div>
+                            <h5>Fator Competitividade</h5>
+                            <p>Provas maiores valem mais:</p>
+                            <div class="formula-box small">
+                                f = 0.8 + min(1.2, atletas/500)
+                            </div>
+                            <div class="mt-3">
+                                <strong>Mínimo:</strong> 0.8 (poucos atletas)<br>
+                                <strong>Máximo:</strong> 2.0 (600+ atletas)
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="col-md-6 col-lg-4 mb-4">
+                    <div class="card factor-card h-100">
+                        <div class="card-body text-center p-4">
+                            <div class="factor-icon">
+                                <i class="fas fa-route"></i>
+                            </div>
+                            <h5>Fator Distância</h5>
+                            <p>Reconhece esforço com retornos decrescentes:</p>
+                            <div class="formula-box small">
+                                f = √(distância_km / 10)
+                            </div>
+                            <div class="mt-3">
+                                <strong>10km:</strong> 1.0<br>
+                                <strong>21km:</strong> 1.45<br>
+                                <strong>42km:</strong> 2.05
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="col-md-6 col-lg-4 mb-4">
+                    <div class="card factor-card h-100">
+                        <div class="card-body text-center p-4">
+                            <div class="factor-icon">
+                                <i class="fas fa-mountain"></i>
+                            </div>
+                            <h5>Fator Altimetria</h5>
+                            <p>Dificuldade técnica do trail:</p>
+                            <div class="formula-box small">
+                                f = 1 + min(1.0, altimetria_m / 1000)
+                            </div>
+                            <div class="mt-3">
+                                <strong>Plano (0m):</strong> 1.0<br>
+                                <strong>500m:</strong> 1.5<br>
+                                <strong>1000m+:</strong> 2.0 (teto)
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="col-md-6 col-lg-4 mb-4">
+                    <div class="card factor-card h-100">
+                        <div class="card-body text-center p-4">
+                            <div class="factor-icon">
+                                <i class="fas fa-tachometer-alt"></i>
+                            </div>
+                            <h5>Fator Ritmo</h5>
+                            <p>Desempenho absoluto importa:</p>
+                            <div class="formula-box small">
+                                f = max(0.7, 1.3 - (ritmo/10))
+                            </div>
+                            <div class="mt-3">
+                                <strong>4min/km:</strong> 0.9<br>
+                                <strong>5min/km:</strong> 0.8<br>
+                                <strong>6min/km+:</strong> 0.7 (mínimo)
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- FAQ -->
+            <h3 class="mb-4">Perguntas Frequentes</h3>
+            <div class="accordion mb-5" id="faqAccordion">
+                <!-- FAQ items da Versão 2 (mantidos) -->
+
+
+            <!-- Pergunta 1 -->
+            <div class="accordion-item">
+                <h2 class="accordion-header" id="faqHeading1">
+                    <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#faqCollapse1" aria-expanded="false" aria-controls="faqCollapse1">
+                        <i class="fas fa-medal text-primary me-2"></i>
+                        Por que um 12º lugar tem quase a mesma pontuação que um 1º lugar?
+                    </button>
+                </h2>
+                <div id="faqCollapse1" class="accordion-collapse collapse" aria-labelledby="faqHeading1" data-bs-parent="#faqAccordion">
+                    <div class="accordion-body">
+                        <p><strong>Depende da prova!</strong> O sistema considera múltiplos fatores:</p>
+                        <ul>
+                            <li><strong>Nível de competitividade:</strong> Um 12º lugar em uma maratona trail com 400 atletas pode valer mais que um 1º lugar em uma corrida de rua pequena</li>
+                            <li><strong>Dificuldade técnica:</strong> Provas com mais altimetria e terreno técnico valem mais pontos</li>
+                            <li><strong>Desempenho relativo:</strong> A colocação é ponderada pelo total de atletas na prova</li>
+                        </ul>
+                        <p class="mb-0">
+    <strong>Exemplo:</strong> 12º/410 (prova enorme) pode valer MAIS que 1º/45 (prova pequena) porque o <strong>tamanho e nível da prova</strong> contam muito!</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Pergunta 2 -->
+            <div class="accordion-item">
+                <h2 class="accordion-header" id="faqHeading2">
+                    <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#faqCollapse2" aria-expanded="false" aria-controls="faqCollapse2">
+                        <i class="fas fa-road text-secondary me-2"></i>
+                        Por que uma prova de estrada vale menos que uma de trail?
+                    </button>
+                </h2>
+                <div id="faqCollapse2" class="accordion-collapse collapse" aria-labelledby="faqHeading2" data-bs-parent="#faqAccordion">
+                    <div class="accordion-body">
+                        <p>O foco do ranking é <strong>trail running</strong>. Provas de estrada são incluídas para completude, mas com peso menor porque:</p>
+                        <ul>
+                            <li><strong>Menor exigência técnica:</strong> Terreno plano e regular vs. trilhas técnicas</li>
+                            <li><strong>Equipamento diferente:</strong> Tênis e preparação específica distinta</li>
+                            <li><strong>Foco do ranking:</strong> Celebrar atletas de trail running de Ubatuba</li>
+                        </ul>
+                        <p class="mb-0">Porém, um <strong>1º lugar em uma meia maratona competitiva</strong> ainda pode valer mais que um resultado mediano em trail!</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Pergunta 3 -->
+            <div class="accordion-item">
+                <h2 class="accordion-header" id="faqHeading3">
+                    <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#faqCollapse3" aria-expanded="false" aria-controls="faqCollapse3">
+                        <i class="fas fa-chart-line text-success me-2"></i>
+                        Como posso subir no ranking?
+                    </button>
+                </h2>
+                <div id="faqCollapse3" class="accordion-collapse collapse" aria-labelledby="faqHeading3" data-bs-parent="#faqAccordion">
+                    <div class="accordion-body">
+                        <h6>Estratégias para melhorar sua pontuação:</h6>
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="alert alert-success p-2 mb-2">
+                                    <strong><i class="fas fa-mountain me-1"></i>Priorize trails técnicos</strong>
+                                    <p class="small mb-0">Trail moderado+ vale mais que estrada</p>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="alert alert-info p-2 mb-2">
+                                    <strong><i class="fas fa-users me-1"></i>Busque provas competitivas</strong>
+                                    <p class="small mb-0">Mais atletas = mais pontos em potencial</p>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="alert alert-warning p-2 mb-2">
+                                    <strong><i class="fas fa-tachometer-alt me-1"></i>Melhore seu ritmo</strong>
+                                    <p class="small mb-0">Desempenho absoluto importa</p>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="alert alert-primary p-2 mb-2">
+                                    <strong><i class="fas fa-route me-1"></i>Escolha distâncias adequadas</strong>
+                                    <p class="small mb-0">Não só longas, mas desafiadoras</p>
+                                </div>
+                            </div>
+                        </div>
+                        <p class="mb-0"><strong>Dica:</strong> Foque em provas que combinam <strong>dificuldade técnica + bom número de participantes + sua especialidade</strong></p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Pergunta 4 -->
+            <div class="accordion-item">
+                <h2 class="accordion-header" id="faqHeading4">
+                    <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#faqCollapse4" aria-expanded="false" aria-controls="faqCollapse4">
+                        <i class="fas fa-calculator text-danger me-2"></i>
+                        Por que a fórmula é tão complexa?
+                    </button>
+                </h2>
+                <div id="faqCollapse4" class="accordion-collapse collapse" aria-labelledby="faqHeading4" data-bs-parent="#faqAccordion">
+                    <div class="accordion-body">
+                        <p>A complexidade busca <strong>justiça e precisão</strong> na comparação entre atletas:</p>
+                        <ul>
+                            <li><strong>Capturar múltiplas dimensões:</strong> Não apenas tempo ou colocação, mas dificuldade, competitividade, etc.</li>
+                            <li><strong>Evitar distorções:</strong> Nenhum fator único domina excessivamente</li>
+                            <li><strong>Permitir comparações justas:</strong> Entre provas diferentes, distâncias, terrenos</li>
+                            <li><strong>Manter-se relevante:</strong> Com crescimento e evolução do esporte</li>
+                        </ul>
+                        <div class="alert alert-light mt-2">
+                            <i class="fas fa-lightbulb text-warning me-2"></i>
+                            <strong>Transparência total:</strong> Cada componente é mensurável e explicado nesta página!
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Pergunta 5 -->
+            <div class="accordion-item">
+                <h2 class="accordion-header" id="faqHeading5">
+                    <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#faqCollapse5" aria-expanded="false" aria-controls="faqCollapse5">
+                        <i class="fas fa-trophy text-warning me-2"></i>
+                        Por que meu amigo aparece na frente com menos corridas?
+                    </button>
+                </h2>
+                <div id="faqCollapse5" class="accordion-collapse collapse" aria-labelledby="faqHeading5" data-bs-parent="#faqAccordion">
+                    <div class="accordion-body">
+                        <p>Isso acontece porque o ranking <strong>não soma apenas corridas, mas qualidade das performances</strong>:</p>
+                        
+                        <div class="row mb-3">
+                            <div class="col-md-6">
+                                <div class="card border-success h-100">
+                                    <div class="card-body p-3">
+                                        <h6 class="text-success"><i class="fas fa-check-circle me-1"></i>Atleta A</h6>
+                                        <ul class="small mb-0">
+                                            <li><strong>3 corridas</strong></li>
+                                            <li>1º lugar - Trail Moderado</li>
+                                            <li>2º lugar - Trail Extremo</li>
+                                            <li>5º lugar - Maratona Trail</li>
+					    <li>---</li>
+                                            <li><strong>Total: ~800 pontos</strong></li>
+                                        </ul>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="card border-secondary h-100">
+                                    <div class="card-body p-3">
+                                        <h6 class="text-secondary"><i class="fas fa-running me-1"></i>Atleta B</h6>
+                                        <ul class="small mb-0">
+                                            <li><strong>4 corridas</strong></li>
+                                            <li>10º lugar - Provas pequenas</li>
+                                            <li>5º lugar - Estradas</li>
+                                            <li>15º lugar - Trails leves</li>
+					    <li>10º lugar - Trails leves</li>
+                                            <li><strong>Total: ~450 pontos</strong></li>
+                                        </ul>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <p class="mb-0"><strong>Conclusão:</strong> <span class="text-success">Qualidade > Quantidade</span> no RTU. Uma grande performance vale mais que várias medianas!</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Pergunta 6 -->
+            <div class="accordion-item">
+                <h2 class="accordion-header" id="faqHeading6">
+                    <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#faqCollapse6" aria-expanded="false" aria-controls="faqCollapse6">
+                        <i class="fas fa-calendar-alt text-info me-2"></i>
+                        O ranking é anual ou acumulado?
+                    </button>
+                </h2>
+                <div id="faqCollapse6" class="accordion-collapse collapse" aria-labelledby="faqHeading6" data-bs-parent="#faqAccordion">
+                    <div class="accordion-body">
+                        <p>O sistema oferece <strong>ambas as visualizações</strong> através dos filtros:</p>
+                        
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <div class="alert alert-info">
+                                    <h6><i class="fas fa-filter me-2"></i>Filtro por Ano</h6>
+                                    <p class="small mb-0">Selecione um ano específico para ver o ranking daquela temporada</p>
+                                    <ul class="small mt-2 mb-0">
+                                        <li>Ranking anual competitivo</li>
+                                        <li>Comparação entre temporadas</li>
+                                        <li>Evolução ano a ano</li>
+                                    </ul>
+                                </div>
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <div class="alert alert-primary">
+                                    <h6><i class="fas fa-history me-2"></i>Todos os Anos</h6>
+                                    <p class="small mb-0">Veja o ranking histórico acumulado</p>
+                                    <ul class="small mt-2 mb-0">
+                                        <li>Reconhecimento de carreira</li>
+                                        <li>Consistência ao longo do tempo</li>
+                                        <li>Legado no trail de Ubatuba</li>
+                                    </ul>
+                                </div>
+                            </div>
+                        </div>
+                        
+                </div>
+            </div>
+
+        </div>
+        
+        <div class="alert alert-light mt-4">
+            <h6 class="mb-2"><i class="fas fa-comments text-primary me-2"></i>Ainda tem dúvidas?</h6>
+            <p class="mb-2">
+                Entre em contato pelo direct do 
+                <a href="https://instagram.com/rtu.oficial" target="_blank" class="text-primary fw-bold">
+                    <i class="fab fa-instagram me-1"></i>@rtu.oficial
+                </a>
+            </p>
         </div>
     </div>
+</div>
+
+            <!-- Botões de Navegação -->
+            <div class="text-center mt-5">
+                <button class="btn btn-primary btn-lg me-3" onclick="showSection('inicio')">
+                    <i class="fas fa-home me-2"></i>Voltar ao Início
+                </button>
+                <button class="btn btn-success btn-lg" onclick="showSection('ranking')">
+                    <i class="fas fa-trophy me-2"></i>Ver Ranking
+                </button>
+            </div>
+        </div>
+    </section>
 
     <!-- Modal para Detalhes do Atleta -->
     <div class="modal fade" id="atletaDetailModal" tabindex="-1">
         <div class="modal-dialog modal-lg">
             <div class="modal-content">
                 <div class="modal-header">
-                    <h5 class="modal-title" id="atletaDetailModalTitle">Detalhes do Atleta</h5>
+                    <h5 class="modal-title">Detalhes do Atleta</h5>
                     <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
                 </div>
                 <div class="modal-body">
@@ -450,11 +1128,14 @@
                             <p><strong>Sobre:</strong> <span id="detailAtletaSobre"></span></p>
                             <hr>
                             <h5>Estatísticas</h5>
-                            <p><strong>Total de Pontos:</strong> <span id="detailAtletaPontos"></span></p>
-                            <p><strong>Corridas Participadas:</strong> <span id="detailAtletaCorridas"></span></p>
-                            <p><strong>Corridas Trail:</strong> <span id="detailAtletaCorridasTrail"></span></p>
-                            <p><strong>Corridas Estrada:</strong> <span id="detailAtletaCorridasEstrada"></span></p>
-                            <p><strong>Melhor Posição:</strong> <span id="detailAtletaMelhorPosicao"></span></p>
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <p><strong>Total de Pontos:</strong> <span id="detailAtletaPontos"></span></p>
+                                    </div>
+                                <div class="col-md-6">
+                                    <p><strong>Melhor Posição:</strong> <span id="detailAtletaMelhorPosicao"></span></p>
+                                </div>
+                            </div>
                         </div>
                     </div>
                     <div class="mt-4">
@@ -467,6 +1148,7 @@
                                         <th>Data</th>
                                         <th>Distância</th>
                                         <th>Altimetria</th>
+                                        <th>Atletas</th>
                                         <th>Tempo</th>
                                         <th>Posição</th>
                                         <th>Categoria</th>
@@ -493,24 +1175,57 @@
             <div class="spinner-border text-primary" style="width: 3rem; height: 3rem;" role="status">
                 <span class="visually-hidden">Carregando...</span>
             </div>
-            <p class="mt-3">Carregando ranking...</p>
+            <p class="mt-3 fs-5">Carregando ranking...</p>
         </div>
     </div>
 
     <!-- Footer -->
-    <footer class="bg-dark text-white py-4 mt-5">
+    <footer class="footer">
         <div class="container">
             <div class="row">
+                <div class="col-lg-4 mb-4">
+                    <h4>Ranking Trail Ubatuba</h4>
+                    <p>Celebrando o talento dos atletas de trail running de Ubatuba. Juntos, fortalecemos nossa comunidade.</p>
+                    <div class="social-icons mt-3">
+                        <a href="https://instagram.com/rtu.oficial" target="_blank" title="Instagram">
+                            <i class="fab fa-instagram"></i>
+                        </a>
+                        <a href="#" title="Facebook">
+                            <i class="fab fa-facebook-f"></i>
+                        </a>
+                        <a href="#" title="YouTube">
+                            <i class="fab fa-youtube"></i>
+                        </a>
+                    </div>
+                </div>
+                <div class="col-lg-4 mb-4">
+                    <h5>Links Rápidos</h5>
+                    <ul class="list-unstyled">
+                        <li><a href="#" onclick="showSection('inicio')">Início</a></li>
+                        <li><a href="#" onclick="showSection('ranking')">Ranking</a></li>
+                        <li><a href="#" onclick="showSection('como-funciona')">Como Funciona</a></li>
+                        <li><a href="https://instagram.com/rtu.oficial" target="_blank">Participar do Ranking</a></li>
+                    </ul>
+                </div>
+                <div class="col-lg-4 mb-4">
+                    <h5>Contato</h5>
+                    <p>
+                        <i class="fab fa-instagram me-2"></i>
+                        <a href="https://instagram.com/rtu.oficial" target="_blank">@rtu.oficial</a>
+                    </p>
+                    <p class="small text-muted">
+                        <i class="fas fa-info-circle me-1"></i>
+                        Envie os dados das suas corridas pelo direct do Instagram
+                    </p>
+                </div>
+            </div>
+            <hr class="mt-4 mb-4">
+            <div class="row">
                 <div class="col-md-6">
-                    <h5>Ranking Trail Ubatuba</h5>
-                    <p class="small">Celebrando o talento dos atletas de trail running de Ubatuba</p>
+                    <p class="small mb-0">© 2024 Ranking Trail Ubatuba. Todos os direitos reservados.</p>
                 </div>
                 <div class="col-md-6 text-end">
-                    <p class="small">
-                        <i class="fab fa-instagram me-2"></i>
-                        <a href="https://instagram.com/rtu" target="_blank" class="text-white">@rtu</a>
-                    </p>
-                    <p class="small text-muted">© 2024 Ranking Trail Ubatuba. Todos os direitos reservados.</p>
+                    <p class="small mb-0">Desenvolvido com ❤️ para a comunidade trail de Ubatuba</p>
                 </div>
             </div>
         </div>
@@ -522,7 +1237,7 @@
     <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-database-compat.js"></script>
     
     <script>
-        // Configuração do Firebase (apenas leitura)
+        // Configuração do Firebase
         const firebaseConfig = {
             apiKey: "AIzaSyDi5wK70cNr7tJJ55hFsw3vjrMbFtWdc24",
             authDomain: "ctos-efd7c.firebaseapp.com",
@@ -550,9 +1265,32 @@
         let atletas = [];
         let registros = [];
 
-        // ---------- Normalizador Google Drive ----------
+        // ---------- Navegação ----------
+        function showSection(sectionId) {
+            // Atualizar navbar
+            document.querySelectorAll('.nav-link').forEach(link => {
+                link.classList.remove('active');
+            });
+            document.querySelector(`a[onclick="showSection('${sectionId}')"]`).classList.add('active');
+            
+            // Mostrar seção
+            document.querySelectorAll('.section').forEach(section => {
+                section.classList.remove('active-section');
+            });
+            document.getElementById(sectionId).classList.add('active-section');
+            
+            // Rolar para o topo
+            window.scrollTo(0, 0);
+            
+            // Se for ranking, aplicar filtros
+            if (sectionId === 'ranking') {
+                setTimeout(filtrarRanking, 100);
+            }
+        }
+
+        // ---------- Funções para Ranking ----------
         function normalizeGoogleDriveImage(url) {
-            if (!url) return "";
+            if (!url) return "https://via.placeholder.com/300x300?text=🏃‍♂️";
             try {
                 url = url.trim();
                 if (url.includes("/file/d/")) {
@@ -566,27 +1304,10 @@
                 if (url.includes("lh3.googleusercontent.com/d/")) return url;
                 return url;
             } catch (e) {
-                return '';
+                return "https://via.placeholder.com/300x300?text=🏃‍♂️";
             }
         }
 
-        // ---------- Navegação ----------
-        function showSection(sectionId) {
-            // Esconder todas as seções
-            document.querySelectorAll('.section').forEach(section => {
-                section.classList.remove('active-section');
-            });
-            
-            // Mostrar a seção selecionada
-            document.getElementById(sectionId).classList.add('active-section');
-            
-            // Executar filtro automaticamente quando acessar ranking
-            if (sectionId === 'ranking') {
-                setTimeout(filtrarRanking, 100);
-            }
-        }
-
-        // ---------- Funções para Ranking ----------
         function calcularIdade(dataNascimento) {
             if (!dataNascimento) return 0;
             const hoje = new Date();
@@ -646,17 +1367,11 @@
             const ano = document.getElementById('anoFilter').value;
             const categoria = document.getElementById('categoriaFilter').value;
             
-            // Mostrar carregamento
             document.getElementById('loadingOverlay').style.display = 'flex';
             
-            // Calcular pontos por atleta
-            const ranking = calcularRanking(genero, faixaEtaria, ano, categoria);
-            
-            // Exibir ranking
-            exibirRanking(ranking);
-            
-            // Esconder carregamento
             setTimeout(() => {
+                const ranking = calcularRanking(genero, faixaEtaria, ano, categoria);
+                exibirRanking(ranking);
                 document.getElementById('loadingOverlay').style.display = 'none';
             }, 500);
         }
@@ -664,7 +1379,6 @@
         function calcularRanking(genero = 'todos', faixaEtaria = 'todas', ano = new Date().getFullYear().toString(), categoria = 'todas') {
             const pontosPorAtleta = {};
             
-            // Processar registros para calcular pontos
             registros.forEach(registro => {
                 // Filtrar por ano
                 const registroAno = registro.data ? registro.data.split('-')[0] : '';
@@ -706,7 +1420,6 @@
                 pontosPorAtleta[atleta.id].pontos += (registro.pontos || 0);
                 pontosPorAtleta[atleta.id].corridas++;
                 
-                // Contar por categoria
                 if (registro.categoria && registro.categoria !== CATEGORIA_PROVA.ESTRADA) {
                     pontosPorAtleta[atleta.id].corridasTrail++;
                 } else {
@@ -718,246 +1431,319 @@
                 }
             });
             
-            // Converter para array e ordenar por pontos
-            return Object.values(pontosPorAtleta)
-                .sort((a, b) => b.pontos - a.pontos);
+            return Object.values(pontosPorAtleta).sort((a, b) => b.pontos - a.pontos);
         }
 
         function exibirRanking(ranking) {
             const grid = document.getElementById('rankingGrid');
-            grid.innerHTML = '';
+            const noResults = document.getElementById('noResults');
             
             if (ranking.length === 0) {
-                grid.innerHTML = `
-                    <div class="alert alert-info text-center">
-                        <i class="fas fa-info-circle"></i> Nenhum atleta encontrado com os filtros selecionados.
-                    </div>
-                `;
+                grid.innerHTML = '';
+                noResults.style.display = 'block';
                 return;
             }
             
+            noResults.style.display = 'none';
+            grid.innerHTML = '';
+            
             ranking.forEach((item, index) => {
                 const atleta = item.atleta;
+                const idade = calcularIdade(atleta.nascimento);
+                const faixaEtaria = obterFaixaEtaria(idade);
+                
                 const card = document.createElement('div');
                 card.className = 'athlete-ranking-card';
                 card.onclick = () => showAtletaDetails(atleta.id);
                 
-                // Calcular idade
-                const idade = calcularIdade(atleta.nascimento);
-                const faixaEtaria = obterFaixaEtaria(idade);
-                
-                card.innerHTML = `
-                    <div class="athlete-position">${index + 1}º</div>
-                    <img src="${atleta.foto ? normalizeGoogleDriveImage(atleta.foto) : 'https://via.placeholder.com/70x70?text=🏃'}" 
-                         class="athlete-avatar" alt="${atleta.nome}">
-                    <div class="athlete-info">
-                        <div class="athlete-name">${atleta.nome}</div>
-                        <div class="athlete-stats">
-                            <div class="stat-item">
-                                <i class="fas fa-${atleta.genero === 'masculino' ? 'mars' : 'venus'}"></i>
-                                ${atleta.genero} • ${faixaEtaria}
-                            </div>
-                            <div class="stat-item">
-                                <i class="fas fa-users"></i>
-                                ${atleta.equipe || 'Sem equipe'}
-                            </div>
-                            <div class="stat-item">
-                                <i class="fas fa-flag-checkered"></i>
-                                ${item.corridas} corrida${item.corridas !== 1 ? 's' : ''}
-                                ${item.corridasTrail > 0 ? `<span class="badge bg-success ms-1">${item.corridasTrail} trail</span>` : ''}
-                                ${item.corridasEstrada > 0 ? `<span class="badge bg-secondary ms-1">${item.corridasEstrada} estrada</span>` : ''}
-                            </div>
-                            <div class="stat-item">
-                                <i class="fas fa-trophy"></i>
-                                Melhor: ${item.melhorPosicao === Infinity ? 'N/A' : item.melhorPosicao + 'º'}
-                            </div>
-                        </div>
-                    </div>
-                    <div class="athlete-points">
-                        ${item.pontos.toFixed(2)} pts
-                    </div>
-                `;
+card.innerHTML = `
+    <div class="athlete-position">${index + 1}º</div>
+    <img src="${normalizeGoogleDriveImage(atleta.foto)}" class="athlete-avatar" alt="${atleta.nome}">
+    <div class="athlete-info">
+        <div class="athlete-name">${atleta.nome}</div>
+        <div class="athlete-stats">
+            <div class="stat-item">
+                <i class="fas fa-${atleta.genero === 'masculino' ? 'mars' : 'venus'}"></i>
+                ${atleta.genero} • ${faixaEtaria}
+            </div>
+            <div class="stat-item">
+                <i class="fas fa-users"></i>
+                ${atleta.equipe || 'Sem equipe'}
+            </div>
+            <div class="stat-item">
+                <i class="fas fa-flag-checkered"></i>
+                ${item.corridas} corrida${item.corridas !== 1 ? 's' : ''}
+            </div>
+            <div class="stat-item">
+                <i class="fas fa-trophy"></i>
+                Melhor: ${item.melhorPosicao === Infinity ? 'N/A' : item.melhorPosicao + 'º'}
+            </div>
+        </div>
+        <div class="mt-3">
+            ${item.corridasTrail > 0 ? `<span class="badge bg-success me-2 p-2">${item.corridasTrail} trail</span>` : ''}
+            ${item.corridasEstrada > 0 ? `<span class="badge bg-secondary me-2 p-2">${item.corridasEstrada} estrada</span>` : ''}
+        </div>
+    </div>
+    <div class="athlete-points">
+        ${item.pontos.toFixed(1)}<br>
+        <small class="text-muted">pontos</small>
+    </div>
+`;
                 
                 grid.appendChild(card);
             });
         }
 
-        function showAtletaDetails(atletaId) {
-            const atleta = atletas.find(a => a.id === atletaId);
-            if (!atleta) return;
-            
-            // Calcular estatísticas do atleta
-            const registrosAtleta = registros.filter(r => r.atletaId === atletaId);
-            const totalPontos = registrosAtleta.reduce((sum, r) => sum + (r.pontos || 0), 0);
-            const melhorPosicao = registrosAtleta.length > 0 ? Math.min(...registrosAtleta.map(r => r.posicao || Infinity)) : Infinity;
-            const corridasTrail = registrosAtleta.filter(r => r.categoria && r.categoria !== CATEGORIA_PROVA.ESTRADA).length;
-            const corridasEstrada = registrosAtleta.filter(r => !r.categoria || r.categoria === CATEGORIA_PROVA.ESTRADA).length;
-            
-            // Preencher modal
-            document.getElementById('detailAtletaNome').textContent = atleta.nome;
-            document.getElementById('detailAtletaNascimento').textContent = formatarData(atleta.nascimento);
-            document.getElementById('detailAtletaGenero').textContent = atleta.genero;
-            document.getElementById('detailAtletaEquipe').textContent = atleta.equipe || 'N/A';
-            document.getElementById('detailAtletaSobre').textContent = atleta.sobre || 'N/A';
-            document.getElementById('detailAtletaPontos').textContent = totalPontos.toFixed(2);
-            document.getElementById('detailAtletaCorridas').textContent = registrosAtleta.length;
-            document.getElementById('detailAtletaCorridasTrail').textContent = corridasTrail;
-            document.getElementById('detailAtletaCorridasEstrada').textContent = corridasEstrada;
-            document.getElementById('detailAtletaMelhorPosicao').textContent = melhorPosicao === Infinity ? 'N/A' : melhorPosicao + 'º';
-            
-            if (atleta.foto) {
-                document.getElementById('detailAtletaFoto').src = normalizeGoogleDriveImage(atleta.foto);
-            } else {
-                document.getElementById('detailAtletaFoto').src = 'https://via.placeholder.com/300x300?text=Sem+Imagem';
-            }
-            
-            // Preencher histórico
-            const tbody = document.getElementById('detailAtletaHistorico');
-            tbody.innerHTML = '';
-            
-            // Ordenar registros por data (mais recente primeiro)
-            const registrosOrdenados = registrosAtleta.sort((a, b) => {
-                return new Date(b.data) - new Date(a.data);
-            });
-            
-            registrosOrdenados.forEach(registro => {
-                const row = document.createElement('tr');
-                row.innerHTML = `
-                    <td>${registro.corridaNome}</td>
-                    <td>${formatarData(registro.data)}</td>
-                    <td>${registro.distancia}</td>
-                    <td>${registro.altimetria}</td>
-                    <td>${registro.tempo}</td>
-                    <td>${registro.posicao}º</td>
-                    <td>
-                        <span class="${getCategoriaClass(registro.categoria)}">
-                            ${getCategoriaLabel(registro.categoria)}
-                        </span>
-                    </td>
-                    <td>${parseFloat(registro.pontos || 0).toFixed(2)}</td>
-                `;
-                tbody.appendChild(row);
-            });
-            
-            // Mostrar modal
-            bootstrap.Modal.getOrCreateInstance(document.getElementById('atletaDetailModal')).show();
+function showAtletaDetails(atletaId) {
+    const atleta = atletas.find(a => a.id === atletaId);
+    if (!atleta) return;
+    
+    const registrosAtleta = registros.filter(r => r.atletaId === atletaId);
+    const totalPontos = registrosAtleta.reduce((sum, r) => sum + (r.pontos || 0), 0);
+    const melhorPosicao = registrosAtleta.length > 0 ? Math.min(...registrosAtleta.map(r => r.posicao || Infinity)) : Infinity;
+    const corridasTrail = registrosAtleta.filter(r => r.categoria && r.categoria !== CATEGORIA_PROVA.ESTRADA).length;
+    const corridasEstrada = registrosAtleta.filter(r => !r.categoria || r.categoria === CATEGORIA_PROVA.ESTRADA).length;
+    
+    // Calcular estatísticas adicionais
+    //const totalAtletasNasProvas = registrosAtleta.reduce((sum, r) => sum + (parseInt(r.qtdAtletas) || 0), 0);
+    //const mediaAtletasPorProva = registrosAtleta.length > 0 ? Math.round(totalAtletasNasProvas / registrosAtleta.length) : 0;
+    //const provaMaisConcorrida = registrosAtleta.length > 0 ? 
+        //registrosAtleta.reduce((max, r) => Math.max(max, parseInt(r.qtdAtletas) || 0), 0) : 0;
+    
+    // Preencher informações básicas do atleta
+    document.getElementById('detailAtletaNome').textContent = atleta.nome;
+    document.getElementById('detailAtletaNascimento').textContent = formatarData(atleta.nascimento);
+    document.getElementById('detailAtletaGenero').textContent = atleta.genero;
+    document.getElementById('detailAtletaEquipe').textContent = atleta.equipe || 'N/A';
+    document.getElementById('detailAtletaSobre').textContent = atleta.sobre || 'N/A';
+    
+    // Preencher estatísticas
+    document.getElementById('detailAtletaPontos').textContent = totalPontos.toFixed(1);
+    document.getElementById('detailAtletaMelhorPosicao').textContent = melhorPosicao === Infinity ? 'N/A' : melhorPosicao + 'º';
+    
+    // Adicionar estatísticas de quantidade de atletas
+    // Vamos adicionar essas informações ao modal
+    const estatisticasContainer = document.querySelector('.modal-body .row .col-md-8');
+    
+// Calcular totais de KM, tempo e altimetria
+const totalKm = registrosAtleta.reduce((sum, r) => {
+    // Extrai número de distâncias como "12.86km" ou "21,5km"
+    const distancia = r.distancia || '0';
+    const km = parseFloat(distancia.replace(/[^\d.,]/g, '').replace(',', '.')) || 0;
+    return sum + km;
+}, 0);
+
+const totalTempo = registrosAtleta.reduce((sum, r) => {
+    // Tempo em formato "02:15:30"
+    const tempo = r.tempo || '00:00:00';
+    const [horas, minutos, segundos] = tempo.split(':').map(Number);
+    return sum + (horas * 3600 + minutos * 60 + segundos);
+}, 0);
+
+const totalAltimetria = registrosAtleta.reduce((sum, r) => {
+    // Altimetria como "493m" ou "1200m"
+    const alt = r.altimetria || '0';
+    const metros = parseInt(alt.replace(/[^\d]/g, '')) || 0;
+    return sum + metros;
+}, 0);
+
+// Converter tempo total para formato legível
+const formatarTempoTotal = (segundos) => {
+    const horas = Math.floor(segundos / 3600);
+    const minutos = Math.floor((segundos % 3600) / 60);
+    const segs = segundos % 60;
+    return `${horas}h ${minutos}m ${segs}s`;
+};
+
+// Adicionar informações de KM, tempo e altimetria
+const infoAtletasHTML = `
+    <hr>
+    <h5>Estatísticas de Competição</h5>
+    <div class="row">
+        <div class="col-md-6">
+            <p><strong>KMs Total:</strong> <span id="totalKm">${totalKm.toFixed(1)}</span> km</p>
+            <p><strong>Tempo Total:</strong> <span id="totalTempo">${formatarTempoTotal(totalTempo)}</span></p>
+        </div>
+        <div class="col-md-6">
+            <p><strong>Altimetria Total:</strong> <span id="totalAltimetria">${totalAltimetria}</span> m</p>
+            <p><strong>Corridas:</strong> <span id="totalCorridas">${registrosAtleta.length}</span></p>
+        </div>
+    </div>
+`;
+    
+    // Inserir após as estatísticas existentes
+    const estatisticasSection = estatisticasContainer.querySelector('hr');
+    if (estatisticasSection) {
+        estatisticasSection.insertAdjacentHTML('afterend', infoAtletasHTML);
+    }
+    
+    if (atleta.foto) {
+        document.getElementById('detailAtletaFoto').src = normalizeGoogleDriveImage(atleta.foto);
+    } else {
+        document.getElementById('detailAtletaFoto').src = 'https://via.placeholder.com/300x300?text=Sem+Imagem';
+    }
+    
+    // Preencher histórico
+    const tbody = document.getElementById('detailAtletaHistorico');
+    tbody.innerHTML = '';
+    
+    const registrosOrdenados = registrosAtleta.sort((a, b) => new Date(b.data) - new Date(a.data));
+    
+    registrosOrdenados.forEach(registro => {
+        const row = document.createElement('tr');
+        
+        // Formatar número de atletas
+        const qtdAtletas = registro.qtdAtletas || 'N/A';
+        let badgeClass = 'badge';
+        
+        if (qtdAtletas !== 'N/A') {
+            const numAtletas = parseInt(qtdAtletas);
+            if (numAtletas < 50) badgeClass += ' bg-secondary';
+            else if (numAtletas < 150) badgeClass += ' bg-info';
+            else if (numAtletas < 300) badgeClass += ' bg-primary';
+            else badgeClass += ' bg-success';
         }
+        
+        row.innerHTML = `
+            <td>${registro.corridaNome}</td>
+            <td>${formatarData(registro.data)}</td>
+            <td>${registro.distancia}</td>
+            <td>${registro.altimetria}</td>
+            <td>
+                <span class="${badgeClass}">
+                    ${qtdAtletas}
+                </span>
+            </td>
+            <td>${registro.tempo}</td>
+            <td><strong>${registro.posicao}º</strong></td>
+            <td>
+                <span class="${getCategoriaClass(registro.categoria)}">
+                    ${getCategoriaLabel(registro.categoria)}
+                </span>
+            </td>
+            <td>
+                <strong>${parseFloat(registro.pontos || 0).toFixed(1)}</strong>
+            </td>
+        `;
+        tbody.appendChild(row);
+    });
+    
+    // Mostrar modal
+    new bootstrap.Modal(document.getElementById('atletaDetailModal')).show();
+}
 
         function loadDataFromFirebase() {
-            console.log('Carregando dados do Firebase...');
-            
-            // Mostrar loading
             document.getElementById('loadingOverlay').style.display = 'flex';
             
-            // Carregar dados do Firebase
-            const promises = [
+            Promise.all([
                 database.ref('atletas').once('value'),
                 database.ref('registros').once('value')
-            ];
-            
-            Promise.all(promises)
-                .then(([atletasSnapshot, registrosSnapshot]) => {
-                    console.log('Dados recebidos do Firebase');
-                    
-                    // Processar atletas
-                    atletas = [];
-                    atletasSnapshot.forEach((childSnapshot) => {
-                        const data = childSnapshot.val();
-                        atletas.push({
-                            id: childSnapshot.key,
-                            foto: data.foto || '',
-                            nome: data.nome || 'Sem nome',
-                            nascimento: data.nascimento || '',
-                            genero: data.genero || '',
-                            equipe: data.equipe || '',
-                            sobre: data.sobre || ''
-                        });
+            ])
+            .then(([atletasSnapshot, registrosSnapshot]) => {
+                // Processar atletas
+                atletas = [];
+                atletasSnapshot.forEach((childSnapshot) => {
+                    const data = childSnapshot.val();
+                    atletas.push({
+                        id: childSnapshot.key,
+                        foto: data.foto || '',
+                        nome: data.nome || 'Sem nome',
+                        nascimento: data.nascimento || '',
+                        genero: data.genero || '',
+                        equipe: data.equipe || '',
+                        sobre: data.sobre || ''
                     });
-                    
-                    // Processar registros
-                    registros = [];
-                    registrosSnapshot.forEach((childSnapshot) => {
-                        const data = childSnapshot.val();
-                        registros.push({
-                            id: childSnapshot.key,
-                            atletaId: data.atletaId || '',
-                            corridaNome: data.corridaNome || '',
-                            data: data.data || '',
-                            distancia: data.distancia || '',
-                            altimetria: data.altimetria || '',
-                            tempo: data.tempo || '',
-                            qtdAtletas: data.qtdAtletas || '',
-                            posicao: data.posicao || 0,
-                            pontos: data.pontos || 0,
-                            categoria: data.categoria || CATEGORIA_PROVA.ESTRADA,
-                            metrosPor10km: data.metrosPor10km || 0,
-                            eTrail: data.eTrail || false
-                        });
-                    });
-                    
-                    console.log('Dados carregados:', {
-                        atletas: atletas.length,
-                        registros: registros.length
-                    });
-                    
-                    // Carregar anos para o filtro
-                    const anoSelect = document.getElementById('anoFilter');
-                    if (anoSelect) {
-                        const currentYear = new Date().getFullYear();
-                        
-                        // Extrair anos dos registros
-                        const anos = new Set();
-                        registros.forEach(registro => {
-                            if (registro.data) {
-                                const ano = registro.data.split('-')[0];
-                                if (ano) anos.add(ano);
-                            }
-                        });
-                        
-                        // Ordenar anos
-                        const anosArray = Array.from(anos).sort((a, b) => b - a);
-                        
-                        anoSelect.innerHTML = '<option value="todos">Todos</option>';
-                        anosArray.forEach(year => {
-                            const option = document.createElement('option');
-                            option.value = year;
-                            option.textContent = year;
-                            anoSelect.appendChild(option);
-                        });
-                        
-                        // Selecionar ano atual se disponível
-                        if (anosArray.includes(currentYear.toString())) {
-                            anoSelect.value = currentYear.toString();
-                        } else if (anosArray.length > 0) {
-                            anoSelect.value = anosArray[0];
-                        }
-                    }
-                    
-                    // Esconder loading
-                    document.getElementById('loadingOverlay').style.display = 'none';
-                    
-                    console.log('Dados carregados com sucesso!');
-                })
-                .catch((error) => {
-                    console.error("Erro ao carregar dados do Firebase:", error);
-                    
-                    // Mostrar mensagem de erro
-                    const grid = document.getElementById('rankingGrid');
-                    if (grid) {
-                        grid.innerHTML = `
-                            <div class="alert alert-danger text-center">
-                                <i class="fas fa-exclamation-triangle"></i> 
-                                Erro ao carregar dados. Por favor, recarregue a página.
-                            </div>
-                        `;
-                    }
-                    
-                    // Esconder carregamento
-                    document.getElementById('loadingOverlay').style.display = 'none';
                 });
+                
+                // Processar registros
+                registros = [];
+                registrosSnapshot.forEach((childSnapshot) => {
+                    const data = childSnapshot.val();
+                    registros.push({
+                        id: childSnapshot.key,
+                        atletaId: data.atletaId || '',
+                        corridaNome: data.corridaNome || '',
+                        data: data.data || '',
+                        distancia: data.distancia || '',
+                        altimetria: data.altimetria || '',
+                        tempo: data.tempo || '',
+                        qtdAtletas: data.qtdAtletas || '',
+                        posicao: data.posicao || 0,
+                        pontos: data.pontos || 0,
+                        categoria: data.categoria || CATEGORIA_PROVA.ESTRADA,
+                        metrosPor10km: data.metrosPor10km || 0,
+                        eTrail: data.eTrail || false
+                    });
+                });
+                
+                console.log('Dados carregados:', {
+                    atletas: atletas.length,
+                    registros: registros.length
+                });
+                
+                // Atualizar estatísticas
+                atualizarEstatisticas();
+                
+                // Carregar anos para o filtro
+                const anoSelect = document.getElementById('anoFilter');
+                const anos = new Set();
+                registros.forEach(registro => {
+                    if (registro.data) {
+                        const ano = registro.data.split('-')[0];
+                        if (ano) anos.add(ano);
+                    }
+                });
+                
+                const anosArray = Array.from(anos).sort((a, b) => b - a);
+                anoSelect.innerHTML = '<option value="todos">Todos</option>';
+                anosArray.forEach(year => {
+                    const option = document.createElement('option');
+                    option.value = year;
+                    option.textContent = year;
+                    anoSelect.appendChild(option);
+                });
+                
+                // Selecionar ano atual
+                const currentYear = new Date().getFullYear().toString();
+                if (anosArray.includes(currentYear)) {
+                    anoSelect.value = currentYear;
+                } else if (anosArray.length > 0) {
+                    anoSelect.value = anosArray[0];
+                }
+                
+                // Esconder loading
+                document.getElementById('loadingOverlay').style.display = 'none';
+                
+                // Carregar ranking inicial
+                filtrarRanking();
+            })
+            .catch((error) => {
+                console.error("Erro ao carregar dados:", error);
+                document.getElementById('loadingOverlay').style.display = 'none';
+                
+                const grid = document.getElementById('rankingGrid');
+                if (grid) {
+                    grid.innerHTML = `
+                        <div class="alert alert-danger text-center">
+                            <i class="fas fa-exclamation-triangle"></i> 
+                            Erro ao carregar dados. Por favor, recarregue a página.
+                        </div>
+                    `;
+                }
+            });
         }
 
-        // ---------- Funções Auxiliares ----------
+        function atualizarEstatisticas() {
+            document.getElementById('totalAtletas').textContent = atletas.length;
+            document.getElementById('totalCorridas').textContent = registros.length;
+            
+            const corridasTrail = registros.filter(r => r.categoria && r.categoria !== CATEGORIA_PROVA.ESTRADA).length;
+            const corridasEstrada = registros.filter(r => !r.categoria || r.categoria === CATEGORIA_PROVA.ESTRADA).length;
+            
+            document.getElementById('totalTrail').textContent = corridasTrail;
+            document.getElementById('totalEstrada').textContent = corridasEstrada;
+        }
+
         function formatarData(dateStr) {
             if (!dateStr) return 'N/A';
             try {
@@ -971,28 +1757,23 @@
 
         // ---------- Inicialização ----------
         document.addEventListener('DOMContentLoaded', function() {
-            console.log('DOM carregado - Versão Pública');
+            console.log('RTU - Versão 3.0 carregada');
             
             // Carregar dados do Firebase
             loadDataFromFirebase();
             
-            // Adicionar evento para quando mudar para ranking
-            document.querySelector('a[href="#"][onclick="showSection(\'ranking\')"]')
-                .addEventListener('click', function(e) {
+            // Adicionar eventos aos links da navbar
+            document.querySelectorAll('.nav-link').forEach(link => {
+                link.addEventListener('click', function(e) {
                     e.preventDefault();
-                    showSection('ranking');
-                    // Garantir que os dados estão carregados
-                    if (atletas.length === 0 || registros.length === 0) {
-                        loadDataFromFirebase();
-                    }
+                    const sectionId = this.getAttribute('onclick').match(/'([^']+)'/)[1];
+                    showSection(sectionId);
                 });
+            });
             
-            // Adicionar evento para o botão "Ver Ranking"
-            document.querySelector('.btn-primary.btn-lg')?.addEventListener('click', function() {
+            // Adicionar evento ao botão "Ver Ranking" na hero section
+            document.querySelector('.hero-section .btn-light')?.addEventListener('click', function() {
                 showSection('ranking');
-                if (atletas.length === 0 || registros.length === 0) {
-                    loadDataFromFirebase();
-                }
             });
         });
     </script>
