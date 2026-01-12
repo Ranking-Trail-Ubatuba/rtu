@@ -867,6 +867,7 @@
                     </div>
                 </div>
             </div>
+
             <!-- FAQ -->
             <h3 class="mb-4">Perguntas Frequentes</h3>
             <div class="accordion mb-5" id="faqAccordion">
@@ -1093,7 +1094,7 @@
         </div>
     </section>
     <!-- Modal para Detalhes do Atleta -->
-    <div class="modal fade" id="atletaDetailModal" tabindex="-1">
+    <div class="modal fade" id="atletaDetailModal" tabindex="-1" aria-hidden="true">
         <div class="modal-dialog modal-lg">
             <div class="modal-content">
                 <div class="modal-header">
@@ -1103,7 +1104,7 @@
                 <div class="modal-body">
                     <!-- Cabeçalho do Atleta -->
                     <div class="athlete-modal-header">
-                        <img id="detailAtletaFoto" class="athlete-modal-avatar" src="" alt="Foto do atleta" onerror="this.src='https://via.placeholder.com/100x100?text=Sem+Imagem'">
+                        <img id="detailAtletaFoto" class="athlete-modal-avatar" src="" alt="Foto do atleta">
                         <div class="athlete-modal-info">
                             <h4 id="detailAtletaNome" class="athlete-modal-name"></h4>
                             <div class="athlete-modal-details">
@@ -1161,7 +1162,7 @@
     </div>
 
     <!-- Modal para Preview da Imagem do Instagram -->
-    <div class="modal fade" id="instagramPreviewModal" tabindex="-1">
+    <div class="modal fade" id="instagramPreviewModal" tabindex="-1" aria-hidden="true">
         <div class="modal-dialog modal-lg">
             <div class="modal-content">
                 <div class="modal-header">
@@ -1279,8 +1280,8 @@
         let registros = [];
         let currentAtletaId = null;
         let currentTipoImagem = 'feed';
-        let modalInstance = null;
-        let instagramModalInstance = null;
+        let atletaModal = null;
+        let instagramModal = null;
 
         // ---------- Navegação ----------
         function showSection(sectionId) {
@@ -1307,6 +1308,7 @@
                 setTimeout(filtrarRanking, 100);
             }
         }
+
         // ---------- Funções para Ranking ----------
         function normalizeGoogleDriveImage(url) {
             if (!url) return "https://via.placeholder.com/300x300?text=🏃‍♂️";
@@ -1509,7 +1511,6 @@
             
             const registrosAtleta = registros.filter(r => r.atletaId === atletaId);
             const totalPontos = registrosAtleta.reduce((sum, r) => sum + (r.pontos || 0), 0);
-            const melhorPosicao = registrosAtleta.length > 0 ? Math.min(...registrosAtleta.map(r => r.posicao || Infinity)) : Infinity;
             const corridasTrail = registrosAtleta.filter(r => r.categoria && r.categoria !== CATEGORIA_PROVA.ESTRADA).length;
             const corridasEstrada = registrosAtleta.filter(r => !r.categoria || r.categoria === CATEGORIA_PROVA.ESTRADA).length;
             
@@ -1545,11 +1546,13 @@
                 tiposContainer.innerHTML += `<span class="badge bg-secondary me-2">${corridasEstrada} estrada</span>`;
             }
             
-            if (atleta.foto) {
-                document.getElementById('detailAtletaFoto').src = normalizeGoogleDriveImage(atleta.foto);
-            } else {
-                document.getElementById('detailAtletaFoto').src = 'https://via.placeholder.com/100x100?text=Sem+Imagem';
-            }
+            // Configurar imagem com fallback
+            const fotoElement = document.getElementById('detailAtletaFoto');
+            fotoElement.src = normalizeGoogleDriveImage(atleta.foto);
+            fotoElement.onerror = function() {
+                this.src = 'https://via.placeholder.com/100x100?text=Sem+Imagem';
+                this.onerror = null; // Prevenir loops
+            };
             
             // Preencher histórico
             const tbody = document.getElementById('detailAtletaHistorico');
@@ -1577,33 +1580,31 @@
                 tbody.appendChild(row);
             });
             
-            // Destruir instância anterior do modal, se existir
-            if (modalInstance) {
-                modalInstance.dispose();
+            // Criar ou obter instância do modal
+            const modalElement = document.getElementById('atletaDetailModal');
+            if (!atletaModal) {
+                atletaModal = new bootstrap.Modal(modalElement);
+                
+                // Adicionar evento para limpar quando o modal for fechado
+                modalElement.addEventListener('hidden.bs.modal', function() {
+                    // Limpar dados do modal
+                    document.getElementById('detailAtletaNome').textContent = '';
+                    document.getElementById('detailAtletaCategoria').textContent = '';
+                    document.getElementById('equipeText').textContent = '';
+                    document.getElementById('corridasCount').textContent = '0';
+                    document.getElementById('detailAtletaTiposCorrida').innerHTML = '';
+                    const fotoElement = document.getElementById('detailAtletaFoto');
+                    fotoElement.src = '';
+                    fotoElement.onerror = null;
+                    document.getElementById('detailAtletaHistorico').innerHTML = '';
+                    
+                    // Resetar variáveis
+                    currentAtletaId = null;
+                });
             }
             
-            // Criar nova instância do modal
-            const modalElement = document.getElementById('atletaDetailModal');
-            modalInstance = new bootstrap.Modal(modalElement);
-            
-            // Adicionar evento para limpar quando o modal for fechado
-            modalElement.addEventListener('hidden.bs.modal', function() {
-                // Limpar dados do modal
-                document.getElementById('detailAtletaNome').textContent = '';
-                document.getElementById('detailAtletaCategoria').textContent = '';
-                document.getElementById('equipeText').textContent = '';
-                document.getElementById('corridasCount').textContent = '0';
-                document.getElementById('detailAtletaTiposCorrida').innerHTML = '';
-                document.getElementById('detailAtletaFoto').src = '';
-                document.getElementById('detailAtletaHistorico').innerHTML = '';
-                
-                // Liberar a instância
-                modalInstance = null;
-                currentAtletaId = null;
-            });
-            
             // Mostrar modal
-            modalInstance.show();
+            atletaModal.show();
         }
         // ---------- Exportar PDF ----------
         function exportarTop20PDF() {
@@ -1813,23 +1814,19 @@
             
             container.appendChild(previewDiv);
             
-            // Destruir instância anterior do modal, se existir
-            if (instagramModalInstance) {
-                instagramModalInstance.dispose();
+            // Criar ou obter instância do modal
+            const modalElement = document.getElementById('instagramPreviewModal');
+            if (!instagramModal) {
+                instagramModal = new bootstrap.Modal(modalElement);
+                
+                // Adicionar evento para limpar quando o modal for fechado
+                modalElement.addEventListener('hidden.bs.modal', function() {
+                    container.innerHTML = '';
+                });
             }
             
-            // Criar nova instância do modal
-            const modalElement = document.getElementById('instagramPreviewModal');
-            instagramModalInstance = new bootstrap.Modal(modalElement);
-            
-            // Adicionar evento para limpar quando o modal for fechado
-            modalElement.addEventListener('hidden.bs.modal', function() {
-                container.innerHTML = '';
-                instagramModalInstance = null;
-            });
-            
             // Mostrar modal de preview
-            instagramModalInstance.show();
+            instagramModal.show();
         }
 
         function baixarImagemInstagram() {
@@ -1863,8 +1860,6 @@
         }
 
         function compartilharNoInstagram() {
-            // Nota: O Instagram não permite compartilhamento direto via JavaScript
-            // Esta função apenas dá instruções
             alert('Para compartilhar no Instagram:\n\n1. Baixe a imagem usando o botão "Baixar Imagem"\n2. Abra o Instagram\n3. Crie um novo post ou story\n4. Selecione a imagem baixada\n5. Adicione a descrição e compartilhe!');
         }
 
@@ -1995,7 +1990,6 @@
                 return dateStr;
             }
         }
-
         // ---------- Inicialização ----------
         document.addEventListener('DOMContentLoaded', function() {
             console.log('RTU - Ranking Trail Ubatuba carregado');
@@ -2034,16 +2028,21 @@
             document.addEventListener('click', function(e) {
                 const row = e.target.closest('tr');
                 if (row && row.parentNode.id === 'rankingTableBody') {
+                    // Encontrar a posição do atleta
                     const positionCell = row.querySelector('.position-cell');
                     if (positionCell) {
                         const position = parseInt(positionCell.textContent.replace('º', ''));
-                        // Encontrar o atleta na posição clicada
+                        
+                        // Obter filtros atuais
                         const genero = document.getElementById('generoFilter').value;
                         const faixaEtaria = document.getElementById('faixaEtariaFilter').value;
                         const ano = document.getElementById('anoFilter').value;
                         const categoria = document.getElementById('categoriaFilter').value;
                         
+                        // Calcular ranking com filtros atuais
                         const ranking = calcularRanking(genero, faixaEtaria, ano, categoria);
+                        
+                        // Mostrar detalhes do atleta na posição clicada
                         if (ranking[position - 1]) {
                             showAtletaDetails(ranking[position - 1].atleta.id);
                         }
@@ -2058,15 +2057,130 @@
                 });
             });
             
-            // Adicionar eventos para limpar modais ao fechar
-            document.addEventListener('hidden.bs.modal', function(e) {
-                if (e.target.id === 'atletaDetailModal') {
-                    // Já tratado na função showAtletaDetails
-                } else if (e.target.id === 'instagramPreviewModal') {
-                    // Já tratado na função gerarImagemInstagram
+            // Configurar eventos de teclado para acessibilidade
+            document.addEventListener('keydown', function(e) {
+                // ESC fecha modais
+                if (e.key === 'Escape') {
+                    if (atletaModal) {
+                        atletaModal.hide();
+                    }
+                    if (instagramModal) {
+                        instagramModal.hide();
+                    }
+                }
+                
+                // Enter/Space nas linhas da tabela
+                if (e.key === 'Enter' || e.key === ' ') {
+                    const activeElement = document.activeElement;
+                    const row = activeElement.closest('tr');
+                    if (row && row.parentNode.id === 'rankingTableBody') {
+                        e.preventDefault();
+                        row.click();
+                    }
                 }
             });
+            
+            // Adicionar tooltips aos botões
+            setTimeout(function() {
+                // Tooltip para botão de exportar PDF
+                const exportBtn = document.querySelector('.export-pdf-btn');
+                if (exportBtn) {
+                    exportBtn.setAttribute('title', 'Exportar os 20 primeiros colocados em PDF');
+                    exportBtn.setAttribute('data-bs-toggle', 'tooltip');
+                    exportBtn.setAttribute('data-bs-placement', 'bottom');
+                }
+                
+                // Tooltip para botões do Instagram
+                const instaStoryBtn = document.querySelector('.btn-instagram-story');
+                const instaFeedBtn = document.querySelector('.btn-instagram-feed');
+                
+                if (instaStoryBtn) {
+                    instaStoryBtn.setAttribute('title', 'Gerar imagem vertical para Stories do Instagram');
+                    instaStoryBtn.setAttribute('data-bs-toggle', 'tooltip');
+                    instaStoryBtn.setAttribute('data-bs-placement', 'top');
+                }
+                
+                if (instaFeedBtn) {
+                    instaFeedBtn.setAttribute('title', 'Gerar imagem quadrada para Feed do Instagram');
+                    instaFeedBtn.setAttribute('data-bs-toggle', 'tooltip');
+                    instaFeedBtn.setAttribute('data-bs-placement', 'top');
+                }
+                
+                // Inicializar todos os tooltips
+                const tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'));
+                tooltipTriggerList.map(function (tooltipTriggerEl) {
+                    return new bootstrap.Tooltip(tooltipTriggerEl);
+                });
+            }, 1000);
+            
+            // Verificar periodicamente se há dados
+            setInterval(function() {
+                if (atletas.length === 0 && registros.length === 0) {
+                    console.log('Verificando dados...');
+                    // Verificar conexão com Firebase
+                    const connectedRef = database.ref(".info/connected");
+                    connectedRef.once("value").then((snap) => {
+                        if (snap.val() === true) {
+                            loadDataFromFirebase();
+                        }
+                    });
+                }
+            }, 30000); // A cada 30 segundos
+            
+            // Verificação inicial após 3 segundos
+            setTimeout(function() {
+                if (atletas.length === 0) {
+                    console.log('Nenhum dado carregado inicialmente, tentando novamente...');
+                    loadDataFromFirebase();
+                }
+            }, 3000);
+            
+            // Funções de debug (apenas para desenvolvimento)
+            window.debugRTU = {
+                getAtletas: () => atletas,
+                getRegistros: () => registros,
+                getCurrentFilters: () => ({
+                    genero: document.getElementById('generoFilter').value,
+                    faixaEtaria: document.getElementById('faixaEtariaFilter').value,
+                    ano: document.getElementById('anoFilter').value,
+                    categoria: document.getElementById('categoriaFilter').value
+                }),
+                recarregarDados: () => loadDataFromFirebase()
+            };
         });
+
+        // ---------- Funções Auxiliares Globais ----------
+        
+        // Função para obter ranking atual (útil para debugging)
+        function getCurrentRanking() {
+            const genero = document.getElementById('generoFilter').value;
+            const faixaEtaria = document.getElementById('faixaEtariaFilter').value;
+            const ano = document.getElementById('anoFilter').value;
+            const categoria = document.getElementById('categoriaFilter').value;
+            
+            return calcularRanking(genero, faixaEtaria, ano, categoria);
+        }
+        
+        // Função para formatar números com separadores de milhar
+        function formatNumber(num) {
+            if (!num) return '0';
+            return num.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ".");
+        }
+        
+        // Função para verificar conexão com Firebase
+        function checkFirebaseConnection() {
+            return new Promise((resolve) => {
+                const connectedRef = database.ref(".info/connected");
+                connectedRef.once("value").then((snap) => {
+                    resolve(snap.val() === true);
+                }).catch(() => {
+                    resolve(false);
+                });
+                
+                // Timeout após 3 segundos
+                setTimeout(() => resolve(false), 3000);
+            });
+        }
     </script>
 </body>
 </html>
