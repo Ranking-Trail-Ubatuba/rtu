@@ -867,7 +867,6 @@
                     </div>
                 </div>
             </div>
-
             <!-- FAQ -->
             <h3 class="mb-4">Perguntas Frequentes</h3>
             <div class="accordion mb-5" id="faqAccordion">
@@ -1099,12 +1098,12 @@
             <div class="modal-content">
                 <div class="modal-header">
                     <h5 class="modal-title">Detalhes do Atleta</h5>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Fechar"></button>
                 </div>
                 <div class="modal-body">
                     <!-- Cabeçalho do Atleta -->
                     <div class="athlete-modal-header">
-                        <img id="detailAtletaFoto" class="athlete-modal-avatar" src="" alt="Foto do atleta">
+                        <img id="detailAtletaFoto" class="athlete-modal-avatar" src="" alt="Foto do atleta" onerror="this.src='https://via.placeholder.com/100x100?text=Sem+Imagem'">
                         <div class="athlete-modal-info">
                             <h4 id="detailAtletaNome" class="athlete-modal-name"></h4>
                             <div class="athlete-modal-details">
@@ -1167,7 +1166,7 @@
             <div class="modal-content">
                 <div class="modal-header">
                     <h5 class="modal-title">Prévia para Instagram</h5>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Fechar"></button>
                 </div>
                 <div class="modal-body text-center">
                     <div class="mb-3">
@@ -1280,6 +1279,8 @@
         let registros = [];
         let currentAtletaId = null;
         let currentTipoImagem = 'feed';
+        let modalInstance = null;
+        let instagramModalInstance = null;
 
         // ---------- Navegação ----------
         function showSection(sectionId) {
@@ -1287,7 +1288,10 @@
             document.querySelectorAll('.nav-link').forEach(link => {
                 link.classList.remove('active');
             });
-            document.querySelector(`a[onclick="showSection('${sectionId}')"]`).classList.add('active');
+            const targetLink = document.querySelector(`a[onclick="showSection('${sectionId}')"]`);
+            if (targetLink) {
+                targetLink.classList.add('active');
+            }
             
             // Mostrar seção
             document.querySelectorAll('.section').forEach(section => {
@@ -1303,7 +1307,6 @@
                 setTimeout(filtrarRanking, 100);
             }
         }
-
         // ---------- Funções para Ranking ----------
         function normalizeGoogleDriveImage(url) {
             if (!url) return "https://via.placeholder.com/300x300?text=🏃‍♂️";
@@ -1497,6 +1500,7 @@
                 tbody.appendChild(row);
             });
         }
+
         // ---------- Funções do Modal do Atleta ----------
         function showAtletaDetails(atletaId) {
             currentAtletaId = atletaId;
@@ -1573,10 +1577,34 @@
                 tbody.appendChild(row);
             });
             
+            // Destruir instância anterior do modal, se existir
+            if (modalInstance) {
+                modalInstance.dispose();
+            }
+            
+            // Criar nova instância do modal
+            const modalElement = document.getElementById('atletaDetailModal');
+            modalInstance = new bootstrap.Modal(modalElement);
+            
+            // Adicionar evento para limpar quando o modal for fechado
+            modalElement.addEventListener('hidden.bs.modal', function() {
+                // Limpar dados do modal
+                document.getElementById('detailAtletaNome').textContent = '';
+                document.getElementById('detailAtletaCategoria').textContent = '';
+                document.getElementById('equipeText').textContent = '';
+                document.getElementById('corridasCount').textContent = '0';
+                document.getElementById('detailAtletaTiposCorrida').innerHTML = '';
+                document.getElementById('detailAtletaFoto').src = '';
+                document.getElementById('detailAtletaHistorico').innerHTML = '';
+                
+                // Liberar a instância
+                modalInstance = null;
+                currentAtletaId = null;
+            });
+            
             // Mostrar modal
-            new bootstrap.Modal(document.getElementById('atletaDetailModal')).show();
+            modalInstance.show();
         }
-
         // ---------- Exportar PDF ----------
         function exportarTop20PDF() {
             const genero = document.getElementById('generoFilter').value;
@@ -1785,8 +1813,23 @@
             
             container.appendChild(previewDiv);
             
+            // Destruir instância anterior do modal, se existir
+            if (instagramModalInstance) {
+                instagramModalInstance.dispose();
+            }
+            
+            // Criar nova instância do modal
+            const modalElement = document.getElementById('instagramPreviewModal');
+            instagramModalInstance = new bootstrap.Modal(modalElement);
+            
+            // Adicionar evento para limpar quando o modal for fechado
+            modalElement.addEventListener('hidden.bs.modal', function() {
+                container.innerHTML = '';
+                instagramModalInstance = null;
+            });
+            
             // Mostrar modal de preview
-            new bootstrap.Modal(document.getElementById('instagramPreviewModal')).show();
+            instagramModalInstance.show();
         }
 
         function baixarImagemInstagram() {
@@ -1952,6 +1995,7 @@
                 return dateStr;
             }
         }
+
         // ---------- Inicialização ----------
         document.addEventListener('DOMContentLoaded', function() {
             console.log('RTU - Ranking Trail Ubatuba carregado');
@@ -2014,171 +2058,15 @@
                 });
             });
             
-            // Inicializar tooltips do Bootstrap
-            const tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'));
-            const tooltipList = tooltipTriggerList.map(function (tooltipTriggerEl) {
-                return new bootstrap.Tooltip(tooltipTriggerEl);
-            });
-            
-            // Adicionar tooltip ao botão de exportar PDF
-            const exportBtn = document.querySelector('.export-pdf-btn');
-            if (exportBtn) {
-                exportBtn.setAttribute('title', 'Exportar Top 20 do ranking atual para PDF');
-                exportBtn.setAttribute('data-bs-toggle', 'tooltip');
-                exportBtn.setAttribute('data-bs-placement', 'bottom');
-                new bootstrap.Tooltip(exportBtn);
-            }
-            
-            // Adicionar tooltips aos botões do Instagram
-            setTimeout(() => {
-                const instaStoryBtn = document.querySelector('.btn-instagram-story');
-                const instaFeedBtn = document.querySelector('.btn-instagram-feed');
-                
-                if (instaStoryBtn) {
-                    instaStoryBtn.setAttribute('title', 'Gerar imagem no formato vertical para Stories (1080x1920px)');
-                    instaStoryBtn.setAttribute('data-bs-toggle', 'tooltip');
-                    instaStoryBtn.setAttribute('data-bs-placement', 'top');
-                    new bootstrap.Tooltip(instaStoryBtn);
-                }
-                
-                if (instaFeedBtn) {
-                    instaFeedBtn.setAttribute('title', 'Gerar imagem quadrada para Feed (1080x1080px)');
-                    instaFeedBtn.setAttribute('data-bs-toggle', 'tooltip');
-                    instaFeedBtn.setAttribute('data-bs-placement', 'top');
-                    new bootstrap.Tooltip(instaFeedBtn);
-                }
-            }, 1000);
-            
-            // Adicionar feedback visual às linhas da tabela
-            document.addEventListener('mouseover', function(e) {
-                const row = e.target.closest('tr');
-                if (row && row.parentNode.id === 'rankingTableBody') {
-                    row.style.transition = 'all 0.2s ease';
+            // Adicionar eventos para limpar modais ao fechar
+            document.addEventListener('hidden.bs.modal', function(e) {
+                if (e.target.id === 'atletaDetailModal') {
+                    // Já tratado na função showAtletaDetails
+                } else if (e.target.id === 'instagramPreviewModal') {
+                    // Já tratado na função gerarImagemInstagram
                 }
             });
-            
-            // Configurar ano máximo para filtros
-            const anoFilter = document.getElementById('anoFilter');
-            if (anoFilter) {
-                const currentYear = new Date().getFullYear();
-                const maxYear = currentYear + 1; // Permitir próximo ano
-                
-                // Garantir que o ano atual seja uma opção
-                setTimeout(() => {
-                    if (!anoFilter.querySelector(`option[value="${currentYear}"]`)) {
-                        const option = document.createElement('option');
-                        option.value = currentYear.toString();
-                        option.textContent = currentYear.toString();
-                        anoFilter.appendChild(option);
-                    }
-                }, 500);
-            }
-            
-            // Adicionar efeito de loading aos botões
-            document.querySelectorAll('.btn').forEach(button => {
-                button.addEventListener('click', function() {
-                    if (this.classList.contains('export-pdf-btn') || 
-                        this.classList.contains('btn-instagram-story') || 
-                        this.classList.contains('btn-instagram-feed')) {
-                        // Adicionar spinner temporário
-                        const originalHTML = this.innerHTML;
-                        this.innerHTML = '<i class="fas fa-spinner fa-spin me-2"></i> Processando...';
-                        this.disabled = true;
-                        
-                        setTimeout(() => {
-                            this.innerHTML = originalHTML;
-                            this.disabled = false;
-                        }, 2000);
-                    }
-                });
-            });
-            
-            // Adicionar suporte para teclado (acessibilidade)
-            document.addEventListener('keydown', function(e) {
-                // ESC fecha modais
-                if (e.key === 'Escape') {
-                    const modals = document.querySelectorAll('.modal.show');
-                    modals.forEach(modal => {
-                        const modalInstance = bootstrap.Modal.getInstance(modal);
-                        if (modalInstance) modalInstance.hide();
-                    });
-                }
-                
-                // Enter/Space nas linhas da tabela
-                if (e.key === 'Enter' || e.key === ' ') {
-                    const activeElement = document.activeElement;
-                    const row = activeElement.closest('tr');
-                    if (row && row.parentNode.id === 'rankingTableBody' && document.activeElement.tagName !== 'BUTTON') {
-                        e.preventDefault();
-                        row.click();
-                    }
-                }
-            });
-            
-            // Verificar se há dados no carregamento
-            setTimeout(() => {
-                if (atletas.length === 0 && registros.length === 0) {
-                    console.warn('Nenhum dado carregado do Firebase');
-                    // Tentar recarregar após 5 segundos
-                    setTimeout(loadDataFromFirebase, 5000);
-                }
-            }, 3000);
-            
-            // Adicionar mensagem de boas-vindas no console
-            console.log('%c🏃‍♂️ Ranking Trail Ubatuba 🏃‍♀️', 'color: #1e7e34; font-size: 16px; font-weight: bold;');
-            console.log('%cCelebrando o talento dos atletas de trail running de Ubatuba', 'color: #666;');
         });
-        
-        // ---------- Funções Auxiliares Adicionais ----------
-        
-        // Função para obter ranking atual (útil para outras funções)
-        function getCurrentRanking() {
-            const genero = document.getElementById('generoFilter').value;
-            const faixaEtaria = document.getElementById('faixaEtariaFilter').value;
-            const ano = document.getElementById('anoFilter').value;
-            const categoria = document.getElementById('categoriaFilter').value;
-            
-            return calcularRanking(genero, faixaEtaria, ano, categoria);
-        }
-        
-        // Função para formatar números com separadores
-        function formatNumber(num) {
-            return num.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ".");
-        }
-        
-        // Função para verificar conexão com Firebase
-        function checkFirebaseConnection() {
-            return new Promise((resolve) => {
-                const connectedRef = database.ref(".info/connected");
-                connectedRef.on("value", (snap) => {
-                    resolve(snap.val() === true);
-                });
-                
-                // Timeout após 3 segundos
-                setTimeout(() => resolve(false), 3000);
-            });
-        }
-        
-        // Adicionar função global para debug (apenas em desenvolvimento)
-        window.debugRTU = {
-            getAtletas: () => atletas,
-            getRegistros: () => registros,
-            getRanking: () => getCurrentRanking(),
-            recarregarDados: () => loadDataFromFirebase(),
-            testarConexao: () => checkFirebaseConnection()
-        };
-        
-        // Verificar conexão periódicamente
-        setInterval(() => {
-            if (atletas.length === 0) {
-                checkFirebaseConnection().then(isConnected => {
-                    if (!isConnected) {
-                        console.log('Tentando reconectar ao Firebase...');
-                        loadDataFromFirebase();
-                    }
-                });
-            }
-        }, 30000); // A cada 30 segundos
     </script>
 </body>
 </html>
